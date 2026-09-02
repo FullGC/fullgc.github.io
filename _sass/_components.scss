@@ -418,23 +418,77 @@
   p { margin-top: var(--sp-4); color: var(--text-dim); font-size: var(--step-1); max-width: 52ch; }
 }
 
-.about-grid {
-  display: grid;
-  grid-template-columns: 11rem minmax(0, var(--measure));
+/* ── About / profile card ─────────────────────────────────────────────────────
+   The page carries one short paragraph, so the old wide two-column grid left a
+   large empty gap beside the photo. This sizes the text column to the copy
+   instead of to the page. */
+.profile {
+  display: flex;
+  flex-wrap: wrap;
   gap: var(--sp-7);
-  align-items: start;
+  align-items: center;
+  padding: var(--sp-9) 0 var(--sp-8);
+}
 
-  @media (max-width: 48rem) {
-    grid-template-columns: 1fr;
-    gap: var(--sp-5);
-    .avatar { max-width: 9rem; }
+.profile-photo {
+  flex: none;
+  width: 13rem;
+  aspect-ratio: 1;
+  object-fit: cover;
+  object-position: center 20%;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+}
+
+.profile-body {
+  flex: 1 1 22rem;
+  min-width: 0;
+
+  h1 {
+    font-size: var(--step-2);
+    letter-spacing: -0.028em;
   }
 }
 
-.avatar {
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
-  filter: saturate(0.95);
+.profile-lede {
+  margin-top: var(--sp-4);
+  max-width: 42ch;
+  font-size: var(--step-1);
+  line-height: 1.5;
+  letter-spacing: -0.012em;
+  color: var(--text-dim);
+  text-wrap: pretty;
+}
+
+.profile-links {
+  list-style: none;
+  padding: 0;
+  margin-top: var(--sp-6);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    padding: 0.45em 0.85em;
+    font-size: var(--step--1);
+    color: var(--text-dim);
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    transition: color 0.15s var(--ease), border-color 0.15s var(--ease);
+  }
+  a:hover { color: var(--accent); border-color: var(--accent-dim); }
+
+  svg { width: 15px; height: 15px; flex: none; }
+  span { font-family: var(--font-mono); }
+}
+
+@media (max-width: 34rem) {
+  .profile { padding-top: var(--sp-7); gap: var(--sp-5); }
+  .profile-photo { width: 9rem; }
 }
 
 .notfound {

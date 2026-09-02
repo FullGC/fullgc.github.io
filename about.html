@@ -1,0 +1,46 @@
+---
+layout: default
+title: About
+description: Dani Shemesh — software engineer. Backend engineering, observability standards, system design and agentic coding tools.
+image: /img/dani-shemesh.jpg
+permalink: /about/
+---
+<div class="wrap">
+  <div class="profile">
+    <img class="profile-photo" src="{{ '/img/dani-shemesh.jpg' | relative_url }}"
+         width="465" height="600" alt="Dani Shemesh">
+
+    <div class="profile-body">
+      <h1>{{ site.author.name }}</h1>
+
+      <p class="profile-lede">
+        I'm Dani, and I'm a software engineer. I'm passionate about Backend
+        Engineering, engineering and observability standards, system design,
+        agentic coding tools and Formula&nbsp;1.
+      </p>
+
+      {%- comment -%} Contact, without a heading: three labelled links read as
+      contact details on their own. {%- endcomment -%}
+      <ul class="profile-links">
+        <li>
+          <a href="mailto:{{ site.author.email }}">
+            <svg aria-hidden="true"><use href="#i-mail"/></svg>
+            <span>{{ site.author.email }}</span>
+          </a>
+        </li>
+        <li>
+          <a href="https://github.com/{{ site.github_username }}" rel="me">
+            <svg aria-hidden="true"><use href="#i-github"/></svg>
+            <span>@{{ site.github_username }}</span>
+          </a>
+        </li>
+        <li>
+          <a href="https://www.linkedin.com/in/{{ site.linkedin_username }}" rel="me">
+            <svg aria-hidden="true"><use href="#i-linkedin"/></svg>
+            <span>{{ site.linkedin_username }}</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

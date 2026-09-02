@@ -11,9 +11,9 @@ timezone:         Asia/Jerusalem
 
 author:
   name:    Dani Shemesh
-  email:   dani.shemesh@hotmail.com
-  bio:     Backend & infrastructure engineer. I write about the JVM, Scala, and the systems around them.
-  avatar:  /img/me-about.jpg
+  email:   dani.meirsh@gmail.com
+  bio:     Software engineer. Backend engineering, observability standards, system design and agentic coding tools.
+  avatar:  /img/dani-shemesh.jpg
 
 # Used by jekyll-seo-tag for schema.org sameAs + the footer links
 social:

@@ -257,17 +257,3 @@ handled by the layout.
 
 **The link check gates deploys.** A typo'd internal link fails the build rather
 than shipping a 404. That's intentional; read the Actions log.
-
----
-
-## 10. Known gaps
-
-- **Four posts are under 800 words** — jGit-flow Parts 1–2, JBehave Part 3,
-  Stackable Traits Part 2. Thin for their topics. Needs real content, not padding.
-- **`/terraform-synced-state-validation/` returns 404** by design; that post was
-  removed. Expect it in Search Console's error report for a few weeks.
-- **Two Search Console properties exist.** The 2017 one (`google4218…`) holds the
-  historical data; the newer one (`google5087…`) starts from scratch. Both
-  verification files are served deliberately. Check which account owns the old one.
-- **Ad blockers suppress some analytics.** Treat GoatCounter numbers as a floor
-  and a trend, not a precise count.
