@@ -1,0 +1,34 @@
+<section class="comments" aria-label="Comments">
+  {%- if site.giscus.repo_id and site.giscus.repo_id != '' -%}
+    {%- comment -%}
+      giscus stores threads as GitHub Discussions on this repo. It reads the
+      page's data-theme so it follows the site's light/dark toggle.
+    {%- endcomment -%}
+    <script src="https://giscus.app/client.js"
+            data-repo="{{ site.giscus.repo }}"
+            data-repo-id="{{ site.giscus.repo_id }}"
+            data-category="{{ site.giscus.category }}"
+            data-category-id="{{ site.giscus.category_id }}"
+            data-mapping="pathname"
+            data-strict="1"
+            data-reactions-enabled="1"
+            data-emit-metadata="0"
+            data-input-position="top"
+            data-theme="preferred_color_scheme"
+            data-lang="en"
+            data-loading="lazy"
+            crossorigin="anonymous"
+            async></script>
+    <noscript>Comments require JavaScript. You can also
+      <a href="https://github.com/{{ site.giscus.repo }}/discussions">reply on GitHub Discussions</a>.</noscript>
+  {%- else -%}
+    <h2 class="mono">Discuss</h2>
+    <p class="comments-fallback">
+      Comments aren't wired up yet — set <code>giscus.repo_id</code> and
+      <code>giscus.category_id</code> in <code>_config.yml</code> to enable them.
+      In the meantime, reply on
+      <a href="https://www.linkedin.com/in/{{ site.linkedin_username }}">LinkedIn</a>
+      or <a href="mailto:{{ site.author.email }}">email me</a>.
+    </p>
+  {%- endif -%}
+</section>

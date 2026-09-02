@@ -1,24 +1,18 @@
 ---
-title: Stackable Traits pattern - Part 1
-layout: post
-author: Dani Shemesh
-permalink: /stackable-traits-pattern/
-tags:
-- scala
-- stackable
-- traits
-source-id: 1Fx2TpNbL_lKIOBoy4Fni0NjlHa-vjb_J-r_v6gSMUck
-published: true
-date: 2018-07-23 14:20:45
-header-img: "img/burger-stack12.jpg"
+title:       "Stackable Traits pattern in Scala — Part 1"
+part_title:  "Error-reporting design"
+description: >-
+  Scala's stackable traits pattern, built step by step into a layered error-reporting
+  design, with the trait stack, linearisation order and runnable code.
+permalink:   /stackable-traits-pattern/
+date:        2018-07-23 14:20:45
+series:      "Stackable Traits in Scala"
+part:        1
+tags:        [scala, stackable, traits]
+image:       /img/burger-stack12.jpg
+image_w:     1200
+image_h:     378
 ---
-
-<i>This post is the first of a two parts series of articles on Stackable Traits</i>
-
-* [Part-1: Error reporting design with Stackable Traits](https://fullgc.github.io/stackable-traits-pattern/)
-* [Part-2: Gathering Metrics with Stackable Actors](https://fullgc.github.io/stackable-traits-pattern---part-2/)
-
-------------------------------------------------------------------------------------------
 
 *"Traits let you modify the methods of a class, and they do so in a way that allows you to stack those modifications with each other" (Programming in Scala by Martin Odersky)*
 
@@ -29,8 +23,6 @@ The term usually refers to an invocation of a method in an object, where the imp
 Such behavior allows us to ‘stack’ the traits, and use the super call as a ‘pipe’, redirecting output - similar to the ‘pipe’ in Linux. This is the basis for the use-cases we’ll review.
 
 <br><br>
-## Part-1: Error reporting design
-
 Consider the following:
 
 An Ad-Server gets a request for an advertisement from a mobile phone.
@@ -55,7 +47,7 @@ On **InvalidRequestError**
 
 3. Kafka-Producer *sends* a Json Event to Kafka.
 
-<img src="/img/stackable_narrative.png">
+<img src="/img/stackable_narrative.png" alt="How stacked traits compose, layer by layer, over a base implementation">
 
 An Error has a code, a description, and unique properties
 
@@ -89,10 +81,10 @@ object S3_Client {
 ````
 
 <br><br>
-### **Step-by-step implementation, using stackable-traits**
+## **Step-by-step implementation, using stackable-traits**
 
 
-##### Create traits that represent the subscribers and mix them.
+### Create traits that represent the subscribers and mix them.
 
 We’ll create the following traits, each represents a subscriber for an error event
 
@@ -112,7 +104,7 @@ trait ServingError{
 }
 ````
 
-##### Turn the traits into services that activates the Clients
+### Turn the traits into services that activates the Clients
 
 Now it is clear which subscribers should receive a notification on error. We will enrich the traits, so they can activate the clients as well:
 
@@ -145,7 +137,7 @@ trait Kafka extends Sender {
 Alright, so now each trait has a “send” method that handles the event using the appropriate client.
 But we still need to trigger it on the occurrence of an error, and call them in the order described above
 
-##### 'Stack' the services traits with each other
+### 'Stack' the services traits with each other
 
 In other words, a pipe of calls for the ‘send’ method in the services. As discussed, we’ll need to use super method calls for that.
 Note that in this step we won’t be stacking modifications, but the side-effects that triggered an error.
@@ -214,9 +206,9 @@ You might notice that
 
 3. Kafka would call super, i.e. S3-Backup would be invoked only when KafkaProducer fails to deliver.
 
-##### Create and 'Stack' modification traits:
+### Create and 'Stack' modification traits:
 
-<img src="/img/stack-traits.jpg" height = '300'>
+<img src="/img/stack-traits.jpg" height = '300' alt="A stack of traits layered over a base class">
 
 The event content needs modification to be in the right format (json, csv) before being sent as an input to KafkaProducer and S3. A fatal error needs to be sent with a timestamp.
 
@@ -288,7 +280,7 @@ case class InvalidRequestError(paramName: String, paramValue: String, override v
 }
 ````
 
-##### Create and mix 'ServingErrorSender' :
+### Create and mix 'ServingErrorSender' :
 
 Last, to trigger error reports once an error object is created, we’ll mix them with a sending trait.
 
@@ -309,7 +301,7 @@ trait ServingError extends ServingErrorSender{
 ````
 
 <br><br>
-### **Try it out**
+## **Try it out**
 
 We have completed the task!
 
@@ -333,34 +325,15 @@ sending to Kafka:  // Kafka
 ````
 
 <br><br>
-### **Next**
+## **Next**
 
-In [part-2](https://fullgc.github.io/stackable-traits-pattern---part-2/) we'll use stackable-actor traits for gathering actor’s metrics.
+In [part-2]({{ '/stackable-traits-pattern---part-2/' | relative_url }}) we'll use stackable-actor traits for gathering actor’s metrics.
 
 <br><br>
-### **References**
+## **References**
 
 *[Programming in Scala(chapter 12.5) / Martin Odersky and co](https://www.artima.com/shop/programming_in_scala_3ed)*
 
 ------------------------------------------------------------------------------------------
 
 *The complete source code and more running examples can be found in my [github](https://github.com/FullGC/stackable-traits)*.
-
-<div id="disqus_thread"></div>
-<script>
-
-/**
-*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
-*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
-var disqus_config = function () {
-this.page.url = "https://fullgc.github.io/stackable-traits-pattern/"
-this.page.identifier = stackable-1
-};
-(function() { // DON'T EDIT BELOW THIS LINE
-var d = document, s = d.createElement('script');
-s.src = 'https://FullGC.disqus.com/embed.js';
-s.setAttribute('data-timestamp', +new Date());
-(d.head || d.body).appendChild(s);
-})();
-</script>
-<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>

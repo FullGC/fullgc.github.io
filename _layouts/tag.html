@@ -1,0 +1,32 @@
+---
+layout: default
+---
+<div class="wrap">
+  <header class="page-header">
+    <span class="kicker mono">TAG</span>
+    <h1>#{{ page.tag }}</h1>
+    <p>{{ page.posts | size }} post{% if page.posts.size != 1 %}s{% endif %} tagged
+       <strong>{{ page.tag }}</strong> on {{ site.title }}.</p>
+  </header>
+
+  <ul class="post-list">
+    {%- for post in page.posts -%}
+      {%- assign words = post.content | number_of_words -%}
+      {%- assign mins = words | divided_by: 220 | plus: 1 -%}
+      <li class="entry">
+        <div class="entry-meta">
+          <time class="mono" datetime="{{ post.date | date_to_xmlschema }}">
+            {{ post.date | date: '%b %-d, %Y' | upcase }}
+          </time>
+          <span class="mono">· {{ mins }} min read</span>
+        </div>
+        <h2><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h2>
+        <p class="dek">{{ post.description | default: post.excerpt | strip_html | normalize_whitespace | truncate: 190 }}</p>
+      </li>
+    {%- endfor -%}
+  </ul>
+
+  <p style="margin-top: var(--sp-7)">
+    <a class="tag" href="{{ '/tags/' | relative_url }}">all tags</a>
+  </p>
+</div>

@@ -1,0 +1,118 @@
+/* ── Page frame ──────────────────────────────────────────────────────────── */
+
+.wrap {
+  width: var(--page);
+  margin-inline: auto;
+}
+
+.main { flex: 1 0 auto; }
+
+/* ── Header ──────────────────────────────────────────────────────────────── */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  height: var(--header-h);
+  background: color-mix(in oklab, var(--bg) 82%, transparent);
+  backdrop-filter: saturate(1.6) blur(12px);
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s var(--ease), background 0.2s var(--ease);
+
+  &.is-scrolled { border-bottom-color: var(--border); }
+
+  .wrap {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    gap: var(--sp-5);
+  }
+}
+
+.brand {
+  font-family: var(--font-mono);
+  font-size: 1.0625rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  margin-right: auto;
+
+  &::before {
+    content: "";
+    display: inline-block;
+    width: 0.5em; height: 0.5em;
+    margin-right: 0.5em;
+    border-radius: 50%;
+    background: var(--accent);
+    vertical-align: 0.08em;
+  }
+  &:hover { color: var(--accent); }
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-5);
+
+  a {
+    font-size: var(--step--1);
+    font-weight: 550;
+    color: var(--text-dim);
+    &:hover, &[aria-current] { color: var(--text); }
+    &[aria-current] { color: var(--accent); }
+  }
+}
+
+.nav-icons {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+  margin-left: var(--sp-2);
+  padding-left: var(--sp-4);
+  border-left: 1px solid var(--border);
+}
+
+.icon-btn {
+  display: grid;
+  place-items: center;
+  width: 34px; height: 34px;
+  border-radius: var(--radius);
+  color: var(--text-mute);
+  transition: color 0.15s var(--ease), background 0.15s var(--ease);
+
+  &:hover { color: var(--text); background: var(--bg-elev); }
+  svg { width: 17px; height: 17px; }
+}
+
+/* The two glyphs inside the theme toggle swap based on the active theme. */
+.theme-toggle .i-moon { display: none; }
+:root[data-theme="light"]  .theme-toggle .i-moon { display: block; }
+:root[data-theme="light"]  .theme-toggle .i-sun  { display: none; }
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) .theme-toggle .i-moon { display: block; }
+  :root:not([data-theme="dark"]) .theme-toggle .i-sun  { display: none; }
+}
+
+@media (max-width: 34rem) {
+  .nav a[data-optional] { display: none; }
+  .nav { gap: var(--sp-4); }
+}
+
+/* ── Footer ──────────────────────────────────────────────────────────────── */
+
+.site-footer {
+  margin-top: var(--sp-9);
+  border-top: 1px solid var(--border);
+  padding: var(--sp-6) 0 var(--sp-7);
+  color: var(--text-mute);
+  font-size: var(--step--1);
+
+  .wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-4) var(--sp-5);
+    align-items: baseline;
+  }
+  .footer-links { display: flex; gap: var(--sp-5); margin-left: auto; }
+  a:hover { color: var(--accent); }
+}

@@ -1,0 +1,30 @@
+---
+layout: default
+title: Archive
+description: Every post on fullgc, newest first — Scala, the JVM, Akka, Kubernetes, Consul, Vault and CI/CD.
+permalink: /archive/
+---
+<div class="wrap">
+  <header class="page-header">
+    <span class="kicker mono">ALL POSTS</span>
+    <h1>Archive</h1>
+    <p>{{ site.posts | size }} posts, newest first.</p>
+  </header>
+
+  {%- assign years = site.posts | group_by_exp: 'post', "post.date | date: '%Y'" -%}
+  {%- for year in years -%}
+  <section class="year-group">
+    <h2>{{ year.name }}</h2>
+    <ul>
+      {%- for post in year.items -%}
+      <li>
+        <time class="when mono" datetime="{{ post.date | date_to_xmlschema }}">
+          {{ post.date | date: '%b %-d' | upcase }}
+        </time>
+        <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+      </li>
+      {%- endfor -%}
+    </ul>
+  </section>
+  {%- endfor -%}
+</div>

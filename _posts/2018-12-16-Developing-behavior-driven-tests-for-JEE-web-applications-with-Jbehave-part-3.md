@@ -1,36 +1,25 @@
 ---
-title: Developing behavior-driven tests for JEE web applications with Jbehave - Part 3
-layout: post
-author: Dani Shemesh
-permalink: /developing-behavior-with-jbehave-part-3/
-tags:
-- jee
-- java
-- jbehave
-- bdd
-- automation
-- tests
-date: 2018-12-19 14:15:45
-published: true
-header-img: "img/behave-color.jpg"
+title:       "Behavior-driven tests for JEE with JBehave — Part 3"
+part_title:  "Automating tests and generating reports"
+description: >-
+  Automating a JBehave suite: map stories to step methods, run them against a live
+  server, and generate the interactive Thucydides reports teams read.
+permalink:   /developing-behavior-with-jbehave-part-3/
+date:        2018-12-19 14:15:45
+series:      "Behavior-driven Tests for JEE with JBehave"
+part:        3
+tags:        [jee, java, jbehave, bdd, automation, tests]
+image:       /img/behave-color.jpg
+image_w:     1016
+image_h:     594
 ---
 
-<i>This post is the third of a three parts series of articles about Developing behavior-driven tests for JEE web applications with Jbehave</i>
-
-* [Part-1: Terminology, Tools and the 'Volcano' stories](https://fullgc.github.io/developing-behavior-with-jbehave-part-1)
-* [Part-2: Writing Stories and Java Implementation](https://fullgc.github.io/developing-behavior-with-jbehave-part-2)
-* [Part-3: Automate the tests and generate reports](https://fullgc.github.io/developing-behavior-with-jbehave-part-3)
-
-------------------------------------------------------------------------------------------
-
 <br><br>
-## Part 3 - Automate the tests and generate reports
-
 Previously, we implemented the step cases in a Java code.
 In this part we'll learn how to automate them and generate informative reports at the end of the run.
 
 -----------------------------------------------------------------------------------------------------
-### Identify implementation methods
+## Identify implementation methods
 
 You may recall we mentioned that Jbehave registered the Java implementation methods on start up. But how does it identify an implementation step?
 
@@ -41,26 +30,26 @@ import net.thucydides.jbehave.ThucydidesJUnitStories;
 public class ApiBDDTestSuite extends ThucydidesJUnitStories {}
 ````
 
-#### Final project structure:
+### Final project structure:
 
-![image alt text]({{ site.url }}/public/dB6XOsGGWuUM1t1RHDV3g_img_6.png)
+![Final project structure of the JBehave and Thucydides test suite]({{ '/public/dB6XOsGGWuUM1t1RHDV3g_img_6.png' | relative_url }})
 
 <br><br>
-### Running the tests
+## Running the tests
 
 At this point, we can run the tests as Junit.
 
 -----------------------------------------------------------------------------------------------------
-#### Running the tests manually
+### Running the tests manually
 
 In order for the black-box tests to pass, we need to have a server up and running. To run the tests with the IDE, right click on the 'jbehave' package.
 
-![image alt text]({{ site.url }}/public/dB6XOsGGWuUM1t1RHDV3g_img_7.png)
+![Running the JBehave suite from the IDE by right-clicking the jbehave package]({{ '/public/dB6XOsGGWuUM1t1RHDV3g_img_7.png' | relative_url }})
 
 In this fashion, we can run the tests quickly, debugging them and the server.
 
 <br><br>
-#### Automate the tests with Jetty(Maven plugin)
+### Automate the tests with Jetty(Maven plugin)
 
 What we really want is to test the Volcano server as part of the maven build, the 'maven compile' task.
 In this case, we need maven to start a Volcano HTTP server, run the tests, and get Volcano down.
@@ -120,7 +109,7 @@ Note that:
 4. In the executions section we tell jetty to start before the tests are executed and stop afterwards. If we don't explicitly ask that, then the jetty would stay up.
 
 <br><br>
-### Test Summary Reports
+## Test Summary Reports
 
 Test Summary Reports are an important deliverable. They are needed to reflect test results in a clear way, allowing them to be analyzed quickly.
 
@@ -149,16 +138,16 @@ This will generate various reports automatically at the end of the Maven run, in
 
 The 'index.html' file that has been created is the most comprehensive, interactive report:
 
-![image alt text]({{ site.url }}/public/dB6XOsGGWuUM1t1RHDV3g_img_8.png)
+![The generated Thucydides index.html report summarising every test story]({{ '/public/dB6XOsGGWuUM1t1RHDV3g_img_8.png' | relative_url }})
 
 A click on the 'change password' test (story) for example, would provide some additional data on each step result.
 
-![image alt text]({{ site.url }}/public/dB6XOsGGWuUM1t1RHDV3g_img_9.png)
+![Thucydides report drilled into the 'change password' story, showing per-step results]({{ '/public/dB6XOsGGWuUM1t1RHDV3g_img_9.png' | relative_url }})
 
 You can zoom in with a click on the various test components to get results and statistics.
 
 <br><br>
-### Wrapping up
+## Wrapping up
 
 Behavior Driven Development is a methodology for developing software through example-based communication among developers, QAs, and project managers.
 

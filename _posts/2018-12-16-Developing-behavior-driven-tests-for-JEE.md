@@ -1,45 +1,35 @@
 ---
-title: Developing behavior-driven tests for JEE web applications with Jbehave - Part 1
-layout: post
-author: Dani Shemesh
-permalink: /developing-behavior-with-jbehave-part-1/
-tags:
-- jee
-- java
-- jbehave
-- bdd
-- automation
-- tests
-date: 2018-12-19 14:05:45
-published: true
-header-img: "img/behave-color.jpg"
+title:       "Behavior-driven tests for JEE with JBehave — Part 1"
+part_title:  "Terminology, tools and the 'Volcano' stories"
+description: >-
+  JBehave and Thucydides for BDD on a JEE web app: the terminology that matters, how
+  the toolchain fits together, and the 'Volcano' stories used throughout.
+permalink:   /developing-behavior-with-jbehave-part-1/
+date:        2018-12-19 14:05:45
+series:      "Behavior-driven Tests for JEE with JBehave"
+part:        1
+tags:        [jee, java, jbehave, bdd, automation, tests]
+image:       /img/behave-color.jpg
+image_w:     1016
+image_h:     594
 ---
-
-<i>This post is the first of a three parts series of articles about Developing behavior-driven tests for JEE web applications with Jbehave</i>
-
-* [Part-1: Terminology, Tools and the 'Volcano' stories](https://fullgc.github.io/developing-behavior-with-jbehave-part-1)
-* [Part-2: Writing Stories and Java Implementation](https://fullgc.github.io/developing-behavior-with-jbehave-part-2)
-* [Part-3: Automate the tests and generate reports](https://fullgc.github.io/developing-behavior-with-jbehave-part-3)
-
-------------------------------------------------------------------------------------------
 
 Behavior-driven development, or BDD, is an agile software development process that provides the developers, QA, project managers and business team with a shared tool-set and process for software development collaboration.
 
 In this guide, we'll learn to design, develop and automate [Black-box](https://en.wikipedia.org/wiki/Black-box_testing) tests for a JEE web application in a [BDD](https://en.wikipedia.org/wiki/Behavior-driven_development) fashion. We’ll develop on top of [Jbehave](https://jbehave.org/) framework.
 
 <br><br>
-## Part 1 - Terminology, Tools and the 'Volcano' stories
 ---
 
-### Glossary
+## Glossary
 
 ------------------------------------------------------------------------------------------
-#### Black-box testing
+### Black-box testing
 
 According to Wikipedia, "Black-box testing is a method of software testing that examines the functionality of an application without peering into its internal structures or workings". As such, Black-box testing focuses entirely on the inputs and outputs of the software system – the “black box”.
 
 <br><br>
-#### Behavior-driven development(BDD)
+### Behavior-driven development(BDD)
 
 Behavior-driven development is an extension of [test-driven development](https://en.wikipedia.org/wiki/Test-driven_development) that makes use of a simple, domain-specific scripting language.
 
@@ -57,7 +47,7 @@ Structure:
 
 * A scenario consists of **steps**, in the format of **'Given-When-Then'**. ‘Given’ and ‘When’ trigger actions, and ‘Then’ is the verification:
 
-![image alt text]({{ site.url }}/public/dB6XOsGGWuUM1t1RHDV3g_img_0.jpg)
+![The behavior-driven development cycle]({{ '/public/dB6XOsGGWuUM1t1RHDV3g_img_0.jpg' | relative_url }})
 
 <br><br>
 ## Frameworks and Tools
@@ -71,7 +61,7 @@ It supports Java-based development, and plain English is used to form the story.
 
 The steps in the story are visually linked to a corresponding Java method:
 
-![image alt text]({{ site.url }}/public/dB6XOsGGWuUM1t1RHDV3g_img_1.png)
+![A JBehave story step linked to its corresponding Java implementation method]({{ '/public/dB6XOsGGWuUM1t1RHDV3g_img_1.png' | relative_url }})
 
 JBehave supports multiple mechanisms for parameter injection. In the above example, the 'user' and ‘password’ as arguments extracted from the @When step, with the @named annotation, following a natural order to the parameters in the annotated Java method.
 
@@ -121,11 +111,11 @@ The project manager of 'Volcano' would like to add some basic features and behav
 
 Each feature will be described in it's own Jbehave story file. Here is how the "Registration" story looks like before applying the '‘Jbehave support’’ plugin:
 
-![image alt text]({{ site.url }}/public/dB6XOsGGWuUM1t1RHDV3g_img_2.png)
+![The Registration JBehave story file before the JBehave IDE support plugin is applied]({{ '/public/dB6XOsGGWuUM1t1RHDV3g_img_2.png' | relative_url }})
 
 And after:
 
-![image alt text]({{ site.url }}/public/dB6XOsGGWuUM1t1RHDV3g_img_3.png)
+![The same Registration story after the JBehave plugin adds step highlighting]({{ '/public/dB6XOsGGWuUM1t1RHDV3g_img_3.png' | relative_url }})
 
 At this stage the steps are marked in red, and we get a message when the mouse hovers that there is no Java method that linked with the steps.
 
@@ -145,7 +135,7 @@ The following Jbehave plugin artifact:
 
 This includes the Jbehave libraries that are required for the Java implementation code behind:
 
-  ![image alt text]({{ site.url }}/public/dB6XOsGGWuUM1t1RHDV3g_img_4.png)
+  ![Maven dependencies required for JBehave and the Java step implementations]({{ '/public/dB6XOsGGWuUM1t1RHDV3g_img_4.png' | relative_url }})
 
 'Jbehave-core' provides the basic Jbehave BDD building blocks: The @Given @When @Then Annotations, and the annotations responsible for the parameter injection (i.e. @Named) ‘Jbehave-junit-runner’ provides functionality for the story and scenarios lifecycle and reporting.
 
@@ -154,22 +144,4 @@ Later on, we'll use it to identify the stories and run the test.
 <br><br>
 ### Next
 
-In [Part-2](https://fullgc.github.io/developing-behavior-with-jbehave-part-2) we'll implement the 'Registration’ story, and review solutions to the implementation challenges.
-
-<div id="disqus_thread"></div>
-<script>
-/**
-*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
-*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
-var disqus_config = function () {
-this.page.url = "https://fullgc.github.io/developing-behavior-with-jbehave-part-1/"
-this.page.identifier = bdd-1
-};
-(function() { // DON'T EDIT BELOW THIS LINE
-var d = document, s = d.createElement('script');
-s.src = 'https://FullGC.disqus.com/embed.js';
-s.setAttribute('data-timestamp', +new Date());
-(d.head || d.body).appendChild(s);
-})();
-</script>
-<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+In [Part-2]({{ '/developing-behavior-with-jbehave-part-2/' | relative_url }}) we'll implement the 'Registration’ story, and review solutions to the implementation challenges.

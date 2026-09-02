@@ -1,42 +1,34 @@
 ---
-title: How to tune Akka to get the most from your Actor-based system - Part 2
-layout: post
-author: Dani Shemesh
-permalink: /how-to-tune-akka-to-get-the-most-from-your-actor-based-system-part-2/
-tags:
-- scala
-- akka
-- kamon
-source-id: 1F1uJy7CsdjhzUlCOz7EQXgHJJWlO_Yr0bI56PpvPpvI
-published: true
-date: 2018-07-25 14:30:45
-header-img: "img/tune-Akka.jpg"
+title:       "How to tune Akka for actor-based systems — Part 2"
+part_title:  "Gathering and analyzing metrics with Kamon"
+description: >-
+  Akka metrics with Kamon: instrument actors, routers and dispatchers using stackable
+  traits, then read the dashboard to find where the real bottleneck is.
+permalink:   /how-to-tune-akka-to-get-the-most-from-your-actor-based-system-part-2/
+date:        2018-07-25 14:30:45
+series:      "Tuning Akka for Actor-based Systems"
+part:        2
+tags:        [scala, akka, kamon]
+image:       /img/tune-Akka.jpg
+image_w:     1200
+image_h:     800
 ---
 
-<i>This post is the second of a two parts series of articles on how to tune Akka configurations</i>
-
-* [Part-1: Initial Akka Configurations](https://fullgc.github.io/how-to-tune-akka-to-get-the-most-from-your-actor-based-system-part-1)
-* [Part-2: Gather and analyze Akka metrics with Kamon and stackable traits](https://fullgc.github.io/how-to-tune-akka-to-get-the-most-from-your-actor-based-system-part-2)
-
-------------------------------------------------------------------------------------------
-
-[Previously](https://fullgc.github.io/how-to-tune-akka-to-get-the-most-from-your-actor-based-system-part-1/), we tried to adjust Akka configurations for some possible use cases. After we set up a configuration and have a system up and running, we’d like to know how well we did and “re-tune” the configuration where needed.
+[Previously]({{ '/how-to-tune-akka-to-get-the-most-from-your-actor-based-system-part-1/' | relative_url }}), we tried to adjust Akka configurations for some possible use cases. After we set up a configuration and have a system up and running, we’d like to know how well we did and “re-tune” the configuration where needed.
 
 <br><br>
-## Part-2: Gather and analyze Akka metrics with Kamon and stackable traits
-
 This part focuses on Akka metrics, meaning a high-level data on the Akka Objects that we’ve configured (i.e. Dispatchers, Routes, Actors (Routees), and Messages). We will consider how we gather them at Inneractive and give some useful tips.
 
 <br><br>
-### **Monitoring Tools for Akka**
+## **Monitoring Tools for Akka**
 
 The Akka library does not include a native monitoring tool. However, there are a few tools that provide additional metrics for an Akka-based application (i.e. memory usage, trace information), profiling and further capabilities that help identify performance issues or identify a bottleneck.
 
 To name a few:
 
-* ['Lightbend Monitoring' ](https://developer.lightbend.com/docs/monitoring/2.0.x/home.html)
+* ['Lightbend Monitoring' ](https://doc.akka.io/docs/akka-insights/current/home.html)
 
-    Provides all necessary features, including key Akka metrics and [span traces](https://developer.lightbend.com/docs/monitoring/2.0.x/instrumentations/akka/akka.html#span-tracer).
+    Provides all necessary features, including key Akka metrics and [span traces](https://doc.akka.io/libraries/akka-insights/current/instrumentations/akka/akka.html).
 
     Takipi plugin provides actor events that can trigger debug snapshots of the stack trace, i.e. the state at the time of the error. By the way… It’s not free...
 
@@ -52,9 +44,9 @@ To name a few:
 * Kamon
 
 <br><br>
-### **Kamon**
+## **Kamon**
 
-#### Overview
+### Overview
 
 Kamon is an open source tool for monitoring applications running on the JVM. It supports various backends and has [modules](http://kamon.io/documentation/get-started) that integrate and gather metrics for Akka, Play, Spray/Akka-Http and more.
 
@@ -64,9 +56,9 @@ Here at Inneractive we use Kamon to gather all metrics, including application cu
 
 It contains metric types functionalities like .histogram(..), .counter(..), .gauge(..) and .minMaxCounter(..)
 
-#### Configuration for Kamon Akka metrics
+### Configuration for Kamon Akka metrics
 
-[Akka integration ](http://kamon.io/documentation/kamon-akka/0.6.6/overview/)has a [collection of metrics](http://kamon.io/documentation/kamon-akka/0.6.6/actor-router-and-dispatcher-metrics/) for actor, router and dispatcher objects. Firstly, they are all collected in our Exchange server. Soon enough our monitoring tools, [Prometheus](https://prometheus.io/) and [Datadog](https://www.datadoghq.com/dg/slpg/?utm_source=Advertisement&utm_medium=GoogleAdsNon1stTierBrand&utm_campaign=GoogleAdsNon1stTierBrand-Non1st&utm_content=Datadog&utm_keyword=%7Bkeyword%7D&utm_matchtype=%7Bmatchtype%7D&gclid=EAIaIQobChMI19CG9MjA1wIVEpMbCh1t0Q4dEAAYASAAEgLd4vD_BwE) went down / froze because of a crazy load of metrics. The reason is that we have 1000 to 1500 Actor instances. The metrics’ names include the instance name (it is not a Tag as you might expect). We do have our own tags like ‘environment’ and ‘host’, and about ~600 Exchange instances. There you get the vast number of metrics that our monitors could not handle.
+[Akka integration ](https://kamon.io/docs/latest/instrumentation/akka/)has a [collection of metrics](https://kamon.io/docs/latest/instrumentation/akka/metrics/) for actor, router and dispatcher objects. Firstly, they are all collected in our Exchange server. Soon enough our monitoring tools, [Prometheus](https://prometheus.io/) and [Datadog](https://www.datadoghq.com/) went down / froze because of a crazy load of metrics. The reason is that we have 1000 to 1500 Actor instances. The metrics’ names include the instance name (it is not a Tag as you might expect). We do have our own tags like ‘environment’ and ‘host’, and about ~600 Exchange instances. There you get the vast number of metrics that our monitors could not handle.
 
 In addition, the ‘aspect’ way of gathering metric’s data is quite expensive, performance wise.
 
@@ -109,9 +101,9 @@ As you may notice, we exclude akka-actor, which means all routees metrics (time-
   message to arrive.
 
 
-#### Tips
+### Tips
 
-1. When you route manually, meaning when you don’t have a router, or whenever you have created the routees explicitly, you can give them names yourself(see [actorOf](https://doc.akka.io/api/akka/2.0/akka/actor/ActorContext.html) parameters).
+1. When you route manually, meaning when you don’t have a router, or whenever you have created the routees explicitly, you can give them names yourself(see [actorOf](https://doc.akka.io/api/akka/current/akka/actor/ActorContext.html) parameters).
 
 2. Akka does not provide an API to know the size of the mailbox. Instead, you can monitor by:
 
@@ -120,11 +112,11 @@ As you may notice, we exclude akka-actor, which means all routees metrics (time-
 * Override the MessageQueue. Google it.
 
 
-#### Configuration for Kamon Akka ActorSystem
+### Configuration for Kamon Akka ActorSystem
 
 As stated, the aspectj operating by Kamon is quite expensive, even when excluding of all routees metrics. By default, Kamon uses the default-dispatcher. If you don't set a default-dispatcher yourself, the threadpool size of the default-dispatcher will be the number of cores. In practice Kamon told us that about 75% of the running threads were Kamon’s..
 
-<img src="/img/kamon_the_rock.png" height = '400'>
+<img src="/img/kamon_the_rock.png" height = '400' alt="Kamon, illustrated">
 
 You can set a dispatcher for Kamon as follows:
 ````
@@ -147,9 +139,9 @@ You can set a dispatcher for Kamon as follows:
 Here we allow up to two threads (but even one would probably be enough), with a parallelism-factor of 0.25, meaning up to two threads when the machine has at least eight cores.
 This does the job.
 
-#### Appendix
+### Appendix
 
-class [ActorMonitor.scala](https://github.com/kamon-io/kamon-akka/blob/master/kamon-akka-2.4.x/src/main/scala/kamon/akka/instrumentation/ActorMonitor.scala) from the module kamon-akka
+class [ActorMonitor.scala](https://github.com/kamon-io/Kamon/blob/master/instrumentation/kamon-akka/src/common/scala/kamon/instrumentation/akka/instrumentations/ActorMonitor.scala) from the module kamon-akka
 
 <!-- HTML generated using hilite.me --><div style="background: #f0f0f0; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><table><tr><td><pre style="margin: 0; line-height: 125%">83
 84
@@ -210,23 +202,23 @@ class [ActorMonitor.scala](https://github.com/kamon-io/kamon-akka/blob/master/ka
 
 
 <br><br>
-### **Monitor with Stackable Actor Traits**
+## **Monitor with Stackable Actor Traits**
 
 We like to collect aggregated data for the routees and messages then.
 
 To monitor time-in-mailbox, processing-time, mailbox-size that we excluded from Kamon metric configuration, we need to monitor ‘around’ the message processing, i.e. around the ‘receive’ method
 
 It can be achieved by imitating Kamon’s usage of Aspectj as we just saw.
-However, we use stackable-traits mixed to the Actors, for a monitoring layer around ‘receive’.
+However, we use [stackable-traits]({{ '/stackable-traits-pattern/' | relative_url }}) mixed to the Actors, for a monitoring layer around ‘receive’.
 
-[I wrote about the stackable traits pattern](https://fullgc.github.io/stackable-traits-pattern/). In [Part-2](https://fullgc.github.io/stackable-traits-pattern---part-2/) **I described (a simplified version of) how we use stackable actor traits at Inneractive, with code samples.**
+[I wrote about the stackable traits pattern]({{ '/stackable-traits-pattern/' | relative_url }}). In [Part-2]({{ '/stackable-traits-pattern---part-2/' | relative_url }}) **I described (a simplified version of) how we use stackable actor traits at Inneractive, with code samples.**
 
 <br><br>
-### **Dashboard Overview**
+## **Dashboard Overview**
 
 Our dashboard consists of Kamon’s Akka metrics and custom metrics.
 
-Akka metrics collection is explained in detail in the [docs](http://kamon.io/documentation/kamon-akka/0.6.6/actor-router-and-dispatcher-metrics/)
+Akka metrics collection is explained in detail in the [docs](https://kamon.io/docs/latest/instrumentation/akka/metrics/)
 
 Among all metrics, put special attention to:
 
@@ -242,38 +234,19 @@ Among all metrics, put special attention to:
 
 * Custom metrics ‘message-start-process’ for routees. When the value is high, it can indicate that the receiver needs more resources or there are too many instances. This leads to lots of context-switches. An increase of the “throughput” parameter may help.
 
-![image alt text]({{ site.url }}/img/dashboard.png)
+![Dashboard of Akka actor metrics collected through Kamon]({{ '/img/dashboard.png' | relative_url }})
 
 <br><br>
-### Wrapping up
+## Wrapping up
 
 Monitoring of the Akka objects plays an important and integral part of the tuning step (and is generally important for keeping track of the system behavior).
 There are various tools and ways to do so, Kamon is friendly and recommended, and you can gather the metrics yourself.
 
 <br><br>
-### References
+## References
 
 *[Kamon Documentation](http://kamon.io/documentation/get-started/)*
 
 *[Kamon-Akka repository](https://github.com/kamon-io/kamon-akka)*
 
-*[Stackable Actor Traits](https://fullgc.github.io/stackable-traits-pattern---part-2/)*
-
-<div id="disqus_thread"></div>
-<script>
-
-/**
-*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
-*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
-var disqus_config = function () {
-this.page.url = "https://fullgc.github.io/how-to-tune-akka-to-get-the-most-from-your-actor-based-system-part-2/"
-this.page.identifier = Akka-2
-};
-(function() { // DON'T EDIT BELOW THIS LINE
-var d = document, s = d.createElement('script');
-s.src = 'https://FullGC.disqus.com/embed.js';
-s.setAttribute('data-timestamp', +new Date());
-(d.head || d.body).appendChild(s);
-})();
-</script>
-<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+*[Stackable Actor Traits]({{ '/stackable-traits-pattern---part-2/' | relative_url }})*

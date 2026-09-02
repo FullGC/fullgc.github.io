@@ -1,0 +1,65 @@
+/* ── Rouge syntax highlighting ───────────────────────────────────────────────
+   One palette expressed through custom properties, redefined for light so the
+   highlighting tracks the theme toggle instead of fighting it. */
+
+:root {
+  --sx-comment: #707b89;   /* 4.52:1 on the code background */
+  --sx-keyword: #ff7bd0;
+  --sx-string:  #9ae88b;
+  --sx-number:  #f5c877;
+  --sx-fn:      #7cc4ff;
+  --sx-type:    #6ee7c4;
+  --sx-const:   #d3aaff;
+  --sx-op:      #b3bac3;
+  --sx-err:     #ff7b72;
+  --sx-meta:    #8b949e;
+}
+:root[data-theme="light"] {
+  --sx-comment: #66707a;   /* 4.54:1 */
+  --sx-keyword: #b5117a;
+  --sx-string:  #10682f;
+  --sx-number:  #8a5a00;
+  --sx-fn:      #0057b8;
+  --sx-type:    #0a6e5c;
+  --sx-const:   #6c2bd0;
+  --sx-op:      #3f464f;
+  --sx-err:     #b3261e;
+  --sx-meta:    #6b7580;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --sx-comment: #66707a; --sx-keyword: #b5117a; --sx-string: #10682f;
+    --sx-number: #8a5a00;  --sx-fn: #0057b8;      --sx-type: #0a6e5c;
+    --sx-const: #6c2bd0;   --sx-op: #3f464f;      --sx-err: #b3261e;
+    --sx-meta: #6b7580;
+  }
+}
+
+.highlight {
+  .c, .cd, .cm, .c1, .cs, .cp    { color: var(--sx-comment); font-style: italic; }
+  .k, .kc, .kd, .kn, .kp, .kr,
+  .kv, .ow                        { color: var(--sx-keyword); }
+  .kt                             { color: var(--sx-type); }
+  .s, .s1, .s2, .sb, .sc, .sd,
+  .se, .sh, .si, .sx, .sr, .ss,
+  .dl                             { color: var(--sx-string); }
+  .m, .mb, .mf, .mh, .mi, .mo,
+  .il                             { color: var(--sx-number); }
+  .nf, .fm                        { color: var(--sx-fn); }
+  .nc, .nn, .ne, .no, .bp         { color: var(--sx-type); }
+  .nb, .nv, .vc, .vg, .vi, .vm    { color: var(--sx-const); }
+  .na, .nl, .nt                   { color: var(--sx-fn); }
+  .o, .p, .pi                     { color: var(--sx-op); }
+  .err, .gr, .gd                  { color: var(--sx-err); }
+  .gi                             { color: var(--sx-string); }
+  .gh, .gu, .gp, .gt              { color: var(--sx-meta); }
+  .ge                             { font-style: italic; }
+  .gs                             { font-weight: 700; }
+
+  .lineno {
+    color: var(--sx-comment);
+    opacity: 0.6;
+    padding-right: var(--sp-4);
+    user-select: none;
+  }
+}

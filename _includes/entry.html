@@ -1,0 +1,87 @@
+{%- comment -%}
+  One item in a post list.
+
+  include.post  — the post to render. If it declares a `series`, the whole
+                  series is rendered as a single entry with its parts listed,
+                  so a three-part write-up reads as one topic instead of three
+                  near-identical titles.
+{%- endcomment -%}
+
+{%- assign post = include.post -%}
+
+{%- if post.series and post.series != '' -%}
+  {%- assign parts = site.posts | where: 'series', post.series | sort: 'part' -%}
+  {%- assign lead = parts | first -%}
+
+  {%- comment -%} Total reading time across the whole series. {%- endcomment -%}
+  {%- assign series_words = 0 -%}
+  {%- for part in parts -%}
+    {%- assign part_words = part.content | number_of_words -%}
+    {%- assign series_words = series_words | plus: part_words -%}
+  {%- endfor -%}
+  {%- assign series_mins = series_words | divided_by: 220 | plus: 1 -%}
+
+  <li class="entry">
+    <div class="entry-meta">
+      <time class="mono" datetime="{{ lead.date | date_to_xmlschema }}">
+        {{ lead.date | date: '%b %Y' | upcase }}
+      </time>
+      <span class="series-badge">{{ parts | size }} parts</span>
+      <span class="mono">· {{ series_mins }} min total</span>
+    </div>
+
+    <h2><a href="{{ lead.url | relative_url }}">{{ post.series }}</a></h2>
+
+    {%- if lead.description -%}
+      <p class="dek">{{ lead.description | strip_html | truncate: 190 }}</p>
+    {%- endif -%}
+
+    <ol class="parts">
+      {%- for part in parts -%}
+      <li>
+        <a href="{{ part.url | relative_url }}">
+          <span class="part-n">Part {{ part.part }}</span>
+          <span class="part-title">{{ part.part_title | default: part.title }}</span>
+        </a>
+      </li>
+      {%- endfor -%}
+    </ol>
+
+    {%- if lead.tags.size > 0 -%}
+    <ul class="entry-foot tags">
+      {%- for tag in lead.tags -%}
+      <li><a class="tag" href="{{ tag | slugify | prepend: '/tags/' | append: '/' | relative_url }}">{{ tag }}</a></li>
+      {%- endfor -%}
+    </ul>
+    {%- endif -%}
+  </li>
+
+{%- else -%}
+
+  {%- assign words = post.content | number_of_words -%}
+  {%- assign mins = words | divided_by: 220 | plus: 1 -%}
+
+  <li class="entry">
+    <div class="entry-meta">
+      <time class="mono" datetime="{{ post.date | date_to_xmlschema }}">
+        {{ post.date | date: '%b %-d, %Y' | upcase }}
+      </time>
+      <span class="mono">· {{ mins }} min read</span>
+    </div>
+
+    <h2><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h2>
+
+    <p class="dek">
+      {{ post.description | default: post.excerpt | strip_html | normalize_whitespace | truncate: 190 }}
+    </p>
+
+    {%- if post.tags.size > 0 -%}
+    <ul class="entry-foot tags">
+      {%- for tag in post.tags -%}
+      <li><a class="tag" href="{{ tag | slugify | prepend: '/tags/' | append: '/' | relative_url }}">{{ tag }}</a></li>
+      {%- endfor -%}
+    </ul>
+    {%- endif -%}
+  </li>
+
+{%- endif -%}

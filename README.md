@@ -1,26 +1,69 @@
-#https://fullgc.github.io/
+# fullgc.github.io
 
-#Clean Blog by Start Bootstrap - Jekyll Version
+Source for **[fullgc.github.io](https://fullgc.github.io)** — engineering write-ups
+on Scala, the JVM, Akka, Kubernetes, Terraform and HashiCorp Vault.
 
-The official Jekyll version of the Clean Blog theme by [Start Bootstrap](http://startbootstrap.com/).
+Jekyll 4, a hand-written theme, no framework, no trackers.
 
-###[View Live Demo &rarr;](http://ironsummitmedia.github.io/startbootstrap-clean-blog-jekyll/)
+## Run it locally
 
-## Before You Begin
+```sh
+bundle install
+bundle exec jekyll serve --livereload
+# → http://127.0.0.1:4000
+```
 
-In the _config.yml file, the base URL is set to /startbootstrap-clean-blog-jekyll which is this themes gh-pages preview. It's recommended that you remove the base URL before working with this theme locally!
+## Write a post
 
-It should look like this:
-`baseurl: ""`
+Add `_posts/YYYY-MM-DD-slug.md`:
 
-## What's Included
+```yaml
+---
+title:        The full headline, written for a search result
+description:  >-
+  One or two sentences. This becomes the meta description and the excerpt on
+  the home page — it is the single highest-leverage field for search traffic,
+  so never leave it out.
+permalink:    /a-stable-slug/       # never change this once published
+date:         2026-09-02 10:00:00
+tags:         [scala, akka]
+image:        /img/social-card.jpg  # OpenGraph / Twitter card
+---
+```
 
-A full Jekyll environment is included with this theme. If you have Jekyll installed, simply run `jekyll serve` in your command line and preview the build in your browser. You can use `jekyll serve --watch` to watch for changes in the source files as well.
+For a multi-part write-up, add `series`, `part` and `part_title`. The home page
+then collapses the whole series into a single entry, and each post gets
+previous/next navigation within it:
 
-A Grunt environment is also included. There are a number of tasks it performs like minification of the JavaScript, compiling of the LESS files, adding banners to keep the Apache 2.0 license intact, and watching for changes. Run the grunt default task by entering `grunt` into your command line which will build the files. You can use `grunt watch` if you are working on the JavaScript or the LESS.
+```yaml
+series:     Tuning Akka
+part:       2
+part_title: Measuring dispatchers with Kamon
+```
 
-You can run `jekyll serve --watch` and `grunt watch` at the same time to watch for changes and then build them all at once.
+Drafts live in `_drafts/` and appear with `jekyll serve --drafts`.
 
-## Support
+## Layout
 
-Visit Clean Blog's template overview page on Start Bootstrap at http://startbootstrap.com/template-overviews/clean-blog/ and leave a comment, email feedback@startbootstrap.com, or open an issue here on GitHub for support.
+| Path | What it is |
+|---|---|
+| `_sass/` | The whole theme. `_tokens.scss` holds every colour, size and font — change the accent there. |
+| `_layouts/` | `default` → `home` / `post` / `page` / `tag` |
+| `_includes/` | `head` (all SEO/meta), `header`, `footer`, `entry` (post card), `comments`, `icons` |
+| `_plugins/tag_pages.rb` | Generates `/tags/<slug>/` for every tag |
+| `assets/js/main.js` | Theme toggle, table of contents, copy buttons, image zoom. No dependencies. |
+
+## Deployment
+
+Pushing to `master` triggers `.github/workflows/pages.yml`, which builds with
+Jekyll 4, runs **html-proofer** over the output to catch broken internal links,
+and deploys to GitHub Pages. Set Pages source to **GitHub Actions** in repo
+settings.
+
+## Still to configure
+
+- `giscus.repo_id` / `giscus.category_id` in `_config.yml` — enable Discussions
+  on the repo, install the [giscus app](https://giscus.app), paste the IDs.
+- `goatcounter` in `_config.yml` — the subdomain of your GoatCounter site.
+
+Both are inert while blank; nothing third-party loads until they're filled in.

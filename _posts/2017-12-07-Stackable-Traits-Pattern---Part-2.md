@@ -1,32 +1,23 @@
 ---
-title: Stackable Traits pattern - Part 2
-layout: post
-author: Dani Shemesh
-permalink: /stackable-traits-pattern---part-2/
-tags:
-- scala
-- stackable
-- traits
-- akka
-source-id: 1m6eIR7wGA1qDRmceIp1S3If9B9k-lpDksi4aRdQ_d1Y
-published: true
-date: 2018-07-23 14:30:45
-header-img: "img/burger-stack12.jpg"
+title:       "Stackable Traits pattern in Scala — Part 2"
+part_title:  "Gathering metrics with stackable actors"
+description: >-
+  Stackable actor traits in Akka: gather per-actor metrics without touching business
+  logic, using the trait-stacking pattern from Part 1 on a real integration.
+permalink:   /stackable-traits-pattern---part-2/
+date:        2018-07-23 14:30:45
+series:      "Stackable Traits in Scala"
+part:        2
+tags:        [scala, stackable, traits, akka]
+image:       /img/burger-stack12.jpg
+image_w:     1200
+image_h:     378
 ---
-
-<i>This post is the second of a two parts series of articles on Stackable Traits</i>
-
-* [Part-1: Error reporting design with Stackable Traits](https://fullgc.github.io/stackable-traits-pattern/)
-* [Part-2: Gathering Metrics with Stackable Actors](https://fullgc.github.io/stackable-traits-pattern---part-2/)
-
-------------------------------------------------------------------------------------------
 
 Stackable traits can be applied to actors as well.
 Specifically, we can use stackable actor traits to modify the behavior of the ‘receive’ method.
 
 <br><br>
-## **Part-2: Gathering Metrics**
-
 We like to gather the following metrics
 
 * time-in-mailbox: The time from the moment a message was enqueued into an actor’s mailbox until the moment it was dequeued for processing.
@@ -36,7 +27,7 @@ We like to gather the following metrics
 And to log when an actor starts handling a message and before it finishes.
 
 <br><br>
-### **Stackable Actors-based implementation**
+## **Stackable Actors-based implementation**
 
 Say we have the following actor that we like to monitor:
 
@@ -84,7 +75,7 @@ trait LatencyRecorderActor extends Actor with StrictLogging {
 
 You might notice that
 
-1. As discussed in [Part-1](https://fullgc.github.io/stackable-traits-pattern/), the modifier of the ‘receive’ method should be “abstract override”
+1. As discussed in [Part-1]({{ '/stackable-traits-pattern/' | relative_url }}), the modifier of the ‘receive’ method should be “abstract override”
 
 2. We gather the metrics only on the 'RecordableMessage' message
 
@@ -117,7 +108,7 @@ And we ended up with:
 
 
 <br><br>
-### **Try it out**
+## **Try it out**
 
 Create a concrete RecordableMessage:
 
@@ -147,31 +138,12 @@ done handling message: SomeTriggerMessage
 ````
 
 <br><br>
-### **Wrapping up**
+## **Wrapping up**
 
 Stackable traits pattern is a good choice when you need to ‘pipe’ actions or modify and redirect data for an action. Mix and stack traits to describe the state of the class and execute the actions are clean and flexible, and generally the Scala-functional way to do it.
 
-<img src="/img/scala_devs.png">
+<img src="/img/scala_devs.png" alt="Scala developers meme">
 
 ------------------------------------------------------------------------------------------
 
 *The complete source code can be found in my [github](https://github.com/FullGC/stackable-traits)*.
-
-<div id="disqus_thread"></div>
-<script>
-
-/**
-*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
-*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
-var disqus_config = function () {
-this.page.url = "https://fullgc.github.io/stackable-traits-pattern---part-2/"
-this.page.identifier = stackable-1
-};
-(function() { // DON'T EDIT BELOW THIS LINE
-var d = document, s = d.createElement('script');
-s.src = 'https://FullGC.disqus.com/embed.js';
-s.setAttribute('data-timestamp', +new Date());
-(d.head || d.body).appendChild(s);
-})();
-</script>
-<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>

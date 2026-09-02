@@ -1,0 +1,92 @@
+/* ── Design tokens ───────────────────────────────────────────────────────────
+   Dark is the default. Light is applied when the reader explicitly picks it,
+   or when the OS asks for it and the reader hasn't overridden.
+   The accent is a single custom property: change these two lines to reskin. */
+
+:root {
+  /* Type. Native stacks: zero font requests, no FOUT, no layout shift.
+     To use Inter/JetBrains Mono instead, self-host the woff2 files and add:
+       @font-face { font-family: "Inter"; src: url(/assets/fonts/…) format("woff2");
+                    font-weight: 100 900; font-display: swap; }
+     then prepend "Inter", to --font-sans. */
+  --font-sans: system-ui, -apple-system, "Segoe UI Variable Text", "Segoe UI",
+               Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+               "Liberation Mono", monospace;
+
+  --step--1: clamp(0.82rem, 0.80rem + 0.10vw, 0.88rem);
+  --step-0:  clamp(1.06rem, 1.02rem + 0.18vw, 1.19rem);
+  --step-1:  clamp(1.26rem, 1.18rem + 0.36vw, 1.50rem);
+  --step-2:  clamp(1.52rem, 1.36rem + 0.70vw, 2.00rem);
+  --step-3:  clamp(1.82rem, 1.54rem + 1.22vw, 2.75rem);
+  --step-4:  clamp(2.18rem, 1.70rem + 2.05vw, 3.75rem);
+
+  /* Space — 4px scale */
+  --sp-1: 0.25rem; --sp-2: 0.5rem;  --sp-3: 0.75rem; --sp-4: 1rem;
+  --sp-5: 1.5rem;  --sp-6: 2rem;    --sp-7: 3rem;    --sp-8: 4rem;
+  --sp-9: 6rem;
+
+  --radius:    6px;
+  --radius-lg: 10px;
+  --measure:   66ch;
+  --page:      min(100% - 2.5rem, 72rem);
+  --header-h:  56px;
+
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* ── Dark (default) ───────────────────────────────────────────────────────── */
+:root,
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg:         #101215;
+  --bg-elev:    #171a1f;
+  --bg-inset:   #0b0d10;
+  --border:     #2c323b;   /* lifted from #262b33: the old hairlines were
+                              effectively invisible on this background */
+  --border-soft:#1f242a;
+  --border-strong:#576274;  /* 3.04:1 — for controls whose affordance IS the box
+                               (the code copy button, the series pager cards) */
+
+  --text:       #e6e8eb;
+  --text-dim:   #b3bac3;
+  --text-mute:  #838d99;   /* 5.57:1 */
+
+  --accent:     #3ddc84;
+  --accent-ink: #06130c;   /* text placed on top of the accent */
+  --accent-dim: #2aa564;
+
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px -12px rgb(0 0 0 / 0.6);
+  --selection: #1e5c3a;
+}
+
+/* ── Light ────────────────────────────────────────────────────────────────── */
+@mixin light {
+  color-scheme: light;
+
+  --bg:         #ffffff;
+  --bg-elev:    #f7f8f9;
+  --bg-inset:   #f2f3f5;
+  --border:     #d5dae0;
+  --border-soft:#e8eaee;
+  --border-strong:#8796a9;  /* 3.01:1 */
+
+  --text:       #16191d;
+  --text-dim:   #3f464f;
+  --text-mute:  #69737e;   /* 4.54:1 on the card background too */
+
+  --accent:     #0d7a3e;   /* was #14914b — only 4.05:1 on white, which fails
+                              AA for link text; this is 5.43:1 */
+  --accent-ink: #ffffff;
+  --accent-dim: #0a6330;
+
+  --shadow: 0 1px 2px rgb(16 22 26 / 0.06), 0 8px 24px -12px rgb(16 22 26 / 0.16);
+  --selection: #b7f0cf;
+}
+
+:root[data-theme="light"] { @include light; }
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) { @include light; }
+}

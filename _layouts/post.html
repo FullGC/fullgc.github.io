@@ -1,63 +1,181 @@
 ---
 layout: default
-comments: true
 ---
+<div class="progress" aria-hidden="true"></div>
 
-<!-- Post Header -->
-<header class="intro-header" style="background-image: url('{{ site.baseurl }}/{{ page.header-img }}')">
-    <div class="container">
-        <div class="row">
+{%- assign words = page.content | number_of_words -%}
+{%- assign mins  = words | divided_by: 220 | plus: 1 -%}
+{%- assign in_series = false -%}
+{%- if page.series and page.series != '' -%}{%- assign in_series = true -%}{%- endif -%}
 
-            <div class="col-lg-10 col-lg-offset-1 col-md-10 col-md-offset-1">
-                <div class="post-heading">
-                    <h1>{{ page.title }}</h1>
-                    {% if page.subtitle %}
-                    <h2 class="subheading">{{ page.subtitle }}</h2>
-                    {% endif %}
-                    <span class="meta">Posted by {{ page.author }} on {{ page.date | date: "%B %-d, %Y" }}</span>
-                </div>
-            </div>
-        </div>
+<div class="wrap">
+  <header class="post-header">
+    <nav class="breadcrumbs mono" aria-label="Breadcrumb">
+      <a href="{{ '/' | relative_url }}">Writing</a>
+      {%- if in_series -%}
+        <span>/</span>{{ page.series }}<span>/</span>Part {{ page.part }}
+      {%- endif -%}
+    </nav>
+
+    <h1>{{ page.title }}</h1>
+    {%- if page.subtitle %}<p class="subtitle">{{ page.subtitle }}</p>{% endif -%}
+
+    <div class="post-meta">
+      <time class="mono" datetime="{{ page.date | date_to_xmlschema }}">
+        {{ page.date | date: '%B %-d, %Y' | upcase }}
+      </time>
+      <span class="mono dot">·</span>
+      <span class="mono">{{ mins }} min read</span>
     </div>
-    {% seo %}
 
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-138478119-1"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
+    {%- comment -%}
+      Tags on their own row. Inline, they needed a "·" separator that was left
+      stranded at the end of the line whenever the list wrapped.
+    {%- endcomment -%}
+    {%- if page.tags.size > 0 -%}
+    <ul class="tags post-tags">
+      {%- for tag in page.tags -%}
+      <li><a class="tag" href="{{ tag | slugify | prepend: '/tags/' | append: '/' | relative_url }}">{{ tag }}</a></li>
+      {%- endfor -%}
+    </ul>
+    {%- endif -%}
+  </header>
 
-        gtag('config', 'UA-138478119-1');
-    </script>
+  {%- comment -%}
+    The post's image, as a capped banner rather than the old full-bleed hero.
+    These are mood photos, so alt="" by default (a decorative image is better
+    left unannounced than given invented description) — set `image_alt` in the
+    front matter when a particular image actually carries meaning.
+    Not lazy-loaded: it is above the fold, where lazy-loading only delays it.
+  {%- endcomment -%}
+  {%- if page.image -%}
+  <figure class="post-banner">
+    <img src="{{ page.image | relative_url }}" width="1200"
+         alt="{{ page.image_alt | default: '' }}" decoding="async">
+  </figure>
+  {%- endif -%}
 
-</header>
+  <div class="post-shell">
+    <article class="prose post-body">
+      {{ content }}
+    </article>
 
+    {%- comment -%} Filled in from the rendered headings by main.js; hidden until then. {%- endcomment -%}
+    <details class="toc toc-rail" open hidden>
+      <summary>Contents</summary>
+      <ol></ol>
+    </details>
+  </div>
 
-<!-- Post Content -->
-<article>
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-10 col-lg-offset-1 col-md-10 col-md-offset-1">
+  <div class="post-foot">
+    {%- comment -%}
+      ── Series navigation ──
+      Walk the parts once, remembering the neighbour on each side. Captured as
+      plain strings because Liquid cannot index an array by a computed value.
+    {%- endcomment -%}
+    {%- if in_series -%}
+      {%- assign parts = site.posts | where: 'series', page.series | sort: 'part' -%}
+      {%- assign found = false -%}
+      {%- assign prev_url = '' -%}{%- assign prev_part = '' -%}{%- assign prev_title = '' -%}
+      {%- assign next_url = '' -%}{%- assign next_part = '' -%}{%- assign next_title = '' -%}
 
-				      {{ content }}
+      {%- for p in parts -%}
+        {%- if found and next_url == '' -%}
+          {%- assign next_url   = p.url -%}
+          {%- assign next_part  = p.part -%}
+          {%- assign next_title = p.part_title | default: p.title -%}
+        {%- endif -%}
+        {%- if p.url == page.url -%}
+          {%- assign found = true -%}
+        {%- elsif found == false -%}
+          {%- assign prev_url   = p.url -%}
+          {%- assign prev_part  = p.part -%}
+          {%- assign prev_title = p.part_title | default: p.title -%}
+        {%- endif -%}
+      {%- endfor -%}
 
-              <hr>
+      {%- if prev_url != '' or next_url != '' -%}
+      <hr>
+      <h2 class="mono">{{ page.series }}</h2>
+      <div class="pager">
+        {%- if prev_url != '' -%}
+        <a class="pager-link" href="{{ prev_url | relative_url }}" rel="prev">
+          <span class="pager-dir mono">&larr; Part {{ prev_part }}</span>
+          <span class="pager-title">{{ prev_title }}</span>
+        </a>
+        {%- else -%}<span></span>{%- endif -%}
 
-              {% include sharing.html %}
+        {%- if next_url != '' -%}
+        <a class="pager-link is-next" href="{{ next_url | relative_url }}" rel="next">
+          <span class="pager-dir mono">Part {{ next_part }} &rarr;</span>
+          <span class="pager-title">{{ next_title }}</span>
+        </a>
+        {%- endif -%}
+      </div>
+      {%- endif -%}
+    {%- endif -%}
 
-            </div>
-        </div>
-    </div>
-</article>
-<br>
+    {%- comment -%}
+      ── Related by shared tags ──
+      Scores every other post by how many tags it shares with this one and lists
+      the best three. Posts in the same series are excluded — the pager above
+      already covers those. This is what finally gives the archive internal links.
+    {%- endcomment -%}
+    {%- assign rows = '' -%}
+    {%- for other in site.posts -%}
+      {%- unless other.url == page.url -%}
+        {%- assign same_series = false -%}
+        {%- if in_series and other.series == page.series -%}{%- assign same_series = true -%}{%- endif -%}
+        {%- unless same_series -%}
+          {%- assign shared = 0 -%}
+          {%- for tag in page.tags -%}
+            {%- if other.tags contains tag -%}{%- assign shared = shared | plus: 1 -%}{%- endif -%}
+          {%- endfor -%}
+          {%- if shared > 0 -%}
+            {%- capture row -%}{{ shared }}|{{ other.url }}|{{ other.title }}|{{ other.date | date: '%b %Y' }}{%- endcapture -%}
+            {%- assign rows = rows | append: row | append: '~~' -%}
+          {%- endif -%}
+        {%- endunless -%}
+      {%- endunless -%}
+    {%- endfor -%}
+    {%- comment -%}
+      Two of the series (JBehave, jGit-flow) share no tags with anything outside
+      themselves. Rather than leave those posts with no outbound links at all,
+      fall back to the most recent other posts — labelled honestly, since it is
+      recency and not topic that put them there.
+    {%- endcomment -%}
+    {%- assign related_kind = 'tags' -%}
+    {%- if rows == '' -%}
+      {%- assign related_kind = 'recent' -%}
+      {%- for other in site.posts -%}
+        {%- unless other.url == page.url -%}
+          {%- assign same_series = false -%}
+          {%- if in_series and other.series == page.series -%}{%- assign same_series = true -%}{%- endif -%}
+          {%- unless same_series -%}
+            {%- capture row -%}0|{{ other.url }}|{{ other.title }}|{{ other.date | date: '%b %Y' }}{%- endcapture -%}
+            {%- assign rows = rows | append: row | append: '~~' -%}
+          {%- endunless -%}
+        {%- endunless -%}
+      {%- endfor -%}
+    {%- endif -%}
 
-<script type="text/javascript" src="https://platform.linkedin.com/badges/js/profile.js" async defer></script>
-<!-- jQuery -->
-<script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
+    {%- assign scored = rows | split: '~~' -%}
+    {%- if related_kind == 'tags' -%}{%- assign scored = scored | sort | reverse -%}{%- endif -%}
 
-<!-- Bootstrap Core JavaScript -->
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+    {%- if scored.size > 0 -%}
+    <hr>
+    <h2 class="mono">{% if related_kind == 'tags' %}Related{% else %}More from the archive{% endif %}</h2>
+    <ul class="related">
+      {%- for row in scored limit: 3 -%}
+        {%- assign fld = row | split: '|' -%}
+        <li>
+          <span class="mono">{{ fld[3] | upcase }}</span>
+          <a href="{{ fld[1] | relative_url }}">{{ fld[2] }}</a>
+        </li>
+      {%- endfor -%}
+    </ul>
+    {%- endif -%}
 
-<!-- Custom Theme JavaScript -->
-<script src="{{ "/js/clean-blog.js " | prepend: site.baseurl }}"></script>
+    {%- if page.comments -%}{%- include comments.html -%}{%- endif -%}
+  </div>
+</div>
