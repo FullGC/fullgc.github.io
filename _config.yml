@@ -27,7 +27,7 @@ linkedin_username: dani-shemesh
 
 # ─── Third party (leave blank to disable entirely) ───────────────────────────
 # GoatCounter: the subdomain of your goatcounter.com site code.
-goatcounter: ""
+goatcounter: "dani-fullgc"
 
 # giscus: fill these in from https://giscus.app after enabling Discussions.
 giscus:
