@@ -32,9 +32,9 @@ goatcounter: "dani-fullgc"
 # giscus: fill these in from https://giscus.app after enabling Discussions.
 giscus:
   repo:        "FullGC/fullgc.github.io"
-  repo_id:     ""
-  category:    "Comments"
-  category_id: ""
+  repo_id:     "MDEwOlJlcG9zaXRvcnkxMTU1MzIwNjg="
+  category:    "General"
+  category_id: "DIC_kwDOBuLhJM4DEvf1"
 
 # ─── Build ───────────────────────────────────────────────────────────────────
 markdown:    kramdown

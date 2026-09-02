@@ -14,6 +14,22 @@
     root.dataset.theme ||
     (matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
 
+  /* giscus is configured with preferred_color_scheme, which tracks the OS.
+     That desyncs the moment a reader uses the toggle here — light page, dark
+     comments — so push the active theme into the iframe instead. */
+  const GISCUS_ORIGIN = "https://giscus.app";
+  const pushGiscusTheme = () => {
+    const frame = document.querySelector("iframe.giscus-frame");
+    frame?.contentWindow?.postMessage(
+      { giscus: { setConfig: { theme: activeTheme() } } },
+      GISCUS_ORIGIN
+    );
+  };
+  // giscus emits a message once it has rendered; only then can it be configured.
+  addEventListener("message", (e) => {
+    if (e.origin === GISCUS_ORIGIN && e.data?.giscus) pushGiscusTheme();
+  });
+
   if (toggle) {
     const sync = () => {
       const next = activeTheme() === "dark" ? "light" : "dark";
@@ -26,6 +42,7 @@
       root.dataset.theme = next;
       try { localStorage.setItem("theme", next); } catch { /* private mode */ }
       sync();
+      pushGiscusTheme();
     });
   }
 
