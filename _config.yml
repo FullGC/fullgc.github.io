@@ -71,8 +71,13 @@ defaults:
   - scope:  { path: "" }
     values:
       layout: page
-  # Google Search Console verification stub — not a page, keep it out of the sitemap.
+  # Google Search Console verification stubs — not pages. No layout (their body
+  # must be the exact token string) and kept out of the sitemap.
   - scope:  { path: "google4218bf4e7ccc7bff.html" }
+    values:
+      sitemap: false
+      layout: null
+  - scope:  { path: "google6ea33805d76b6d50.html" }
     values:
       sitemap: false
       layout: null
