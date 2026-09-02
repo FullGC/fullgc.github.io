@@ -83,6 +83,8 @@ defaults:
       layout: null
 
 exclude:
+  - Makefile
+  - MAINTAINING.md
   - Gemfile
   - Gemfile.lock
   - vendor

@@ -1,47 +1,42 @@
 # fullgc.github.io
 
 Source for **[fullgc.github.io](https://fullgc.github.io)** — engineering write-ups
-on Scala, the JVM, Akka, Kubernetes, Terraform and HashiCorp Vault.
+on Scala, the JVM, Akka, Kubernetes, Consul and HashiCorp Vault.
 
-Jekyll 4, a hand-written theme, no framework, no trackers.
+Jekyll 4, a hand-written theme, no framework, and cookieless analytics.
 
 ## Run it locally
 
 ```sh
-bundle install
-bundle exec jekyll serve --livereload
-# → http://127.0.0.1:4000
+make serve      # → http://localhost:4000
+make drafts     # include _drafts/
+make check      # build + the link check CI runs
 ```
 
-## Write a post
+Runs in Docker, because this machine's system Ruby (2.6) is older than the 3.0
+that Jekyll 4.4 requires. With a modern Ruby installed, `bundle exec jekyll
+serve` works directly.
 
-Add `_posts/YYYY-MM-DD-slug.md`:
+## Writing
+
+**See [MAINTAINING.md](MAINTAINING.md)** for the full front matter reference,
+the series fields, the SEO rules, the post-publishing checklist, and the
+gotchas worth knowing before you change anything.
+
+A minimal post — `_posts/YYYY-MM-DD-slug.md`:
 
 ```yaml
 ---
-title:        The full headline, written for a search result
-description:  >-
-  One or two sentences. This becomes the meta description and the excerpt on
-  the home page — it is the single highest-leverage field for search traffic,
-  so never leave it out.
-permalink:    /a-stable-slug/       # never change this once published
-date:         2026-09-02 10:00:00
-tags:         [scala, akka]
-image:        /img/social-card.jpg  # OpenGraph / Twitter card
+title:       "The headline, written for a search result"
+description: >-
+  One or two sentences. Becomes the meta description and the home page
+  excerpt — the highest-leverage field for search traffic.
+permalink:   /a-stable-slug/       # never change this once published
+date:        2026-09-15 10:00:00
+tags:        [scala, akka]
+image:       /img/social-card.jpg
 ---
 ```
-
-For a multi-part write-up, add `series`, `part` and `part_title`. The home page
-then collapses the whole series into a single entry, and each post gets
-previous/next navigation within it:
-
-```yaml
-series:     Tuning Akka
-part:       2
-part_title: Measuring dispatchers with Kamon
-```
-
-Drafts live in `_drafts/` and appear with `jekyll serve --drafts`.
 
 ## Layout
 
@@ -60,10 +55,3 @@ Jekyll 4, runs **html-proofer** over the output to catch broken internal links,
 and deploys to GitHub Pages. Set Pages source to **GitHub Actions** in repo
 settings.
 
-## Still to configure
-
-- `giscus.repo_id` / `giscus.category_id` in `_config.yml` — enable Discussions
-  on the repo, install the [giscus app](https://giscus.app), paste the IDs.
-- `goatcounter` in `_config.yml` — the subdomain of your GoatCounter site.
-
-Both are inert while blank; nothing third-party loads until they're filled in.
