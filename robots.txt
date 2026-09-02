@@ -1,4 +1,5 @@
 User-agent: *
-Disallow: _includes
-Disallow: _layout
-Sitemap: http://fullgc.github.io/sitemap.xml
+Allow: /
+Disallow: /404.html
+
+Sitemap: https://fullgc.github.io/sitemap.xml

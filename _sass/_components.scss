@@ -1,0 +1,493 @@
+/* ── Reading progress ────────────────────────────────────────────────────── */
+.progress {
+  position: fixed;
+  inset: 0 auto auto 0;
+  z-index: 60;
+  height: 2px;
+  width: 100%;
+  transform-origin: 0 50%;
+  transform: scaleX(var(--p, 0));
+  background: var(--accent);
+  pointer-events: none;
+}
+
+.kicker {
+  display: block;
+  margin-bottom: var(--sp-3);
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  letter-spacing: 0.08em;
+  color: var(--accent);
+}
+
+/* ── Home hero ───────────────────────────────────────────────────────────────
+   No text over the image. Overlaying a wordmark on this chart meant fighting
+   its own title, stat block, tooltip and axis labels, and the scrim needed to
+   win that fight buried the chart. Type above, chart below: nothing collides,
+   and the chart stays fully legible. */
+.hero {
+  padding: var(--sp-7) 0 var(--sp-5);
+}
+
+.hero-text { text-align: center; }
+
+.hero-title {
+  font-size: clamp(2.25rem, 1.7rem + 2.2vw, 3.5rem);
+  font-weight: 750;
+  letter-spacing: -0.035em;
+  line-height: 1;
+}
+
+.hero-rule {
+  width: 3.5rem;
+  margin: var(--sp-4) auto;
+  border: 0;
+  border-top: 2px solid var(--accent);
+}
+
+.hero-tagline {
+  max-width: 34ch;
+  margin-inline: auto;
+  font-size: var(--step-1);
+  line-height: 1.4;
+  color: var(--text-dim);
+  letter-spacing: -0.012em;
+}
+
+.hero-by {
+  margin-top: var(--sp-3);
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  color: var(--text-mute);
+
+  a { color: var(--text-dim); border-bottom: 1px solid var(--border); }
+  a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+}
+
+.hero-chart {
+  display: block;
+  margin: var(--sp-6) auto 0;
+  /* Capped by HEIGHT, with width following — the whole chart, shorter, and
+     downscaled from its native 1024px rather than stretched past it. */
+  height: clamp(150px, 19vw, 230px);
+  width: auto;
+  max-width: 100%;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+}
+
+/* ── Home topics row ─────────────────────────────────────────────────────── */
+.topics {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-top: var(--sp-7);
+  padding-bottom: var(--sp-6);
+
+  .label {
+    margin-right: var(--sp-3);
+    color: var(--text-mute);
+  }
+}
+
+/* The "all 29 tags" link is a tag-shaped control, not a tag — no "#". */
+.tag-all {
+  color: var(--text-dim);
+  &::before { content: none; }
+  &:hover { color: var(--accent); }
+}
+
+.section-head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-4);
+  padding-bottom: var(--sp-4);
+  border-bottom: 1px solid var(--border);
+
+  h2 { font-size: var(--step-0); font-weight: 650; letter-spacing: 0; }
+  .count { margin-left: auto; }
+}
+
+/* ── Post list ───────────────────────────────────────────────────────────── */
+.post-list { list-style: none; padding: 0; }
+
+.entry {
+  padding: var(--sp-5) 0;
+  border-bottom: 1px solid var(--border-soft);
+
+  &:last-child { border-bottom: 0; }
+
+  .entry-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    margin-bottom: var(--sp-3);
+  }
+  h2, h3 {
+    font-size: var(--step-1);
+    letter-spacing: -0.02em;
+    max-width: 40ch;   /* titles are shorter now; 32ch forced awkward wraps */
+  }
+  h2 a, h3 a {
+    background-image: linear-gradient(var(--accent), var(--accent));
+    background-size: 0% 2px;
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    transition: background-size 0.25s var(--ease);
+  }
+  h2 a:hover, h3 a:hover { background-size: 100% 2px; color: var(--accent); }
+
+  .dek {
+    margin-top: var(--sp-3);
+    color: var(--text-dim);
+    max-width: 62ch;
+  }
+  .entry-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-3);
+    margin-top: var(--sp-4);
+  }
+}
+
+/* A multi-part series renders as one entry with its parts listed inside. */
+.series-badge {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  padding: 0.1em 0.5em;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text-mute);
+}
+
+.parts {
+  list-style: none;
+  padding: 0;
+  margin-top: var(--sp-4);
+  display: grid;
+  gap: 1px;
+  background: var(--border-soft);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+
+  li { background: var(--bg); }
+
+  a {
+    display: flex;
+    gap: var(--sp-4);
+    align-items: baseline;
+    padding: var(--sp-3) var(--sp-4);
+    transition: background 0.15s var(--ease);
+
+    &:hover { background: var(--bg-elev); }
+    &:hover .part-title { color: var(--accent); }
+  }
+  .part-n {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    color: var(--text-mute);
+    flex: none;
+    min-width: 3.6em;
+  }
+  .part-title { color: var(--text-dim); }
+}
+
+/* ── Tags ────────────────────────────────────────────────────────────────── */
+.tags { display: flex; flex-wrap: wrap; gap: var(--sp-2); list-style: none; padding: 0; }
+
+.tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  line-height: 1.5;
+  padding: 0.15em 0.6em;
+  color: var(--text-mute);
+  background: var(--bg-elev);
+  border: 1px solid var(--border-soft);
+  border-radius: 999px;
+  transition: color 0.15s var(--ease), border-color 0.15s var(--ease);
+
+  &:hover { color: var(--accent); border-color: var(--accent-dim); }
+  &::before { content: "#"; opacity: 0.5; }
+}
+
+.tag-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  list-style: none;
+  padding: 0;
+  margin-top: var(--sp-6);
+
+  .tag { font-size: var(--step-0); padding: 0.3em 0.8em; }
+  .n { color: var(--text-mute); opacity: 0.7; margin-left: 0.35em; }
+}
+
+/* ── Post header ─────────────────────────────────────────────────────────── */
+.post-header {
+  padding: var(--sp-8) 0 var(--sp-6);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: var(--sp-7);
+
+  .breadcrumbs { margin-bottom: var(--sp-4); }
+  .breadcrumbs a:hover { color: var(--accent); }
+  .breadcrumbs span { opacity: 0.5; margin: 0 0.4em; }
+
+  h1 { font-size: var(--step-3); max-width: 34ch; }
+  .subtitle {
+    margin-top: var(--sp-4);
+    font-size: var(--step-1);
+    font-weight: 400;
+    color: var(--text-dim);
+    max-width: 52ch;
+    letter-spacing: -0.012em;
+  }
+  .post-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-3);
+    margin-top: var(--sp-5);
+  }
+  .post-tags { margin-top: var(--sp-4); }
+  .dot { opacity: 0.4; }
+}
+
+/* ── Post banner ─────────────────────────────────────────────────────────── */
+.post-banner {
+  margin: 0 0 var(--sp-7);
+
+  img {
+    width: 100%;
+    /* An explicit height means no layout shift, and lets images of wildly
+       different aspect ratios (6000x4000 down to 1440x575) crop consistently. */
+    height: clamp(170px, 30vw, 280px);
+    object-fit: cover;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+  }
+}
+
+/* Tighten the header's gap when a banner follows it, so the two don't
+   double up on space. */
+.post-header:has(+ .post-banner) { margin-bottom: var(--sp-5); }
+
+/* ── Post body + optional table-of-contents rail ─────────────────────────── */
+.post-body { max-width: var(--measure); }
+
+.toc {
+  font-size: var(--step--1);
+
+  summary {
+    cursor: pointer;
+    font-family: var(--font-mono);
+    letter-spacing: 0.04em;
+    color: var(--text-mute);
+    padding: var(--sp-3) 0;
+  }
+  summary::marker { color: var(--accent); }
+  ol { list-style: none; padding: 0; margin: 0; }
+  li { margin: 0.1em 0; }
+  a {
+    display: block;
+    padding: 0.3em 0 0.3em var(--sp-4);
+    border-left: 2px solid var(--border);
+    color: var(--text-mute);
+    line-height: 1.4;
+
+    &:hover { color: var(--text); border-left-color: var(--text-mute); }
+    &.is-active { color: var(--accent); border-left-color: var(--accent); }
+  }
+  .lvl-3 a { padding-left: var(--sp-6); font-size: 0.95em; }
+}
+
+.post-shell { display: block; }
+
+@media (min-width: 75rem) {
+  .post-shell {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 15rem;
+    gap: var(--sp-8);
+    align-items: start;
+  }
+  .toc-rail {
+    position: sticky;
+    top: calc(var(--header-h) + var(--sp-5));
+    max-height: calc(100vh - var(--header-h) - var(--sp-8));
+    overflow-y: auto;
+
+    /* Always open in the rail; the <details> toggle is a mobile affordance. */
+    summary { list-style: none; padding-bottom: var(--sp-3); }
+    summary::-webkit-details-marker { display: none; }
+  }
+  .toc-rail[open] > summary { border-bottom: 1px solid var(--border); margin-bottom: var(--sp-3); }
+}
+@media (max-width: 74.99rem) {
+  .toc-rail {
+    margin-bottom: var(--sp-6);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 0 var(--sp-4) var(--sp-2);
+    background: var(--bg-elev);
+  }
+}
+
+/* ── Post footer: series nav, related, comments ──────────────────────────── */
+.post-foot { max-width: var(--measure); margin-top: var(--sp-8); }
+
+.pager {
+  display: grid;
+  gap: var(--sp-3);
+  grid-template-columns: 1fr 1fr;
+  margin-top: var(--sp-5);
+
+  @media (max-width: 40rem) { grid-template-columns: 1fr; }
+}
+
+.pager-link {
+  display: block;
+  padding: var(--sp-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  transition: border-color 0.15s var(--ease), background 0.15s var(--ease);
+
+  border-color: var(--border-strong);
+
+  &:hover { border-color: var(--accent); background: var(--bg-elev); }
+  &:hover .pager-title { color: var(--accent); }
+  &.is-next { text-align: right; }
+
+  .pager-dir { display: block; margin-bottom: var(--sp-2); }
+  .pager-title { font-weight: 600; line-height: 1.35; }
+}
+
+.related {
+  list-style: none;
+  padding: 0;
+  margin-top: var(--sp-4);
+
+  li + li { margin-top: var(--sp-3); }
+  a { color: var(--text-dim); }
+  a:hover { color: var(--accent); }
+  .mono { margin-right: var(--sp-3); }
+}
+
+.comments { margin-top: var(--sp-8); }
+
+.comments-fallback {
+  padding: var(--sp-5);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-lg);
+  color: var(--text-mute);
+  font-size: var(--step--1);
+
+  a { color: var(--accent); border-bottom: 1px solid var(--accent-dim); }
+}
+
+/* ── Archive ─────────────────────────────────────────────────────────────── */
+.year-group {
+  margin-top: var(--sp-7);
+
+  h2 {
+    font-family: var(--font-mono);
+    font-size: var(--step-1);
+    color: var(--text-mute);
+    padding-bottom: var(--sp-3);
+    border-bottom: 1px solid var(--border);
+  }
+  ul { list-style: none; padding: 0; }
+  li {
+    display: flex;
+    gap: var(--sp-4);
+    align-items: baseline;
+    padding: var(--sp-3) 0;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .when { flex: none; min-width: 6.5em; }
+  a:hover { color: var(--accent); }
+}
+
+/* ── Page (about / tags / 404) ───────────────────────────────────────────── */
+.page-header {
+  padding: var(--sp-8) 0 var(--sp-5);
+
+  h1 { font-size: var(--step-3); }
+  p { margin-top: var(--sp-4); color: var(--text-dim); font-size: var(--step-1); max-width: 52ch; }
+}
+
+.about-grid {
+  display: grid;
+  grid-template-columns: 11rem minmax(0, var(--measure));
+  gap: var(--sp-7);
+  align-items: start;
+
+  @media (max-width: 48rem) {
+    grid-template-columns: 1fr;
+    gap: var(--sp-5);
+    .avatar { max-width: 9rem; }
+  }
+}
+
+.avatar {
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  filter: saturate(0.95);
+}
+
+.notfound {
+  text-align: center;
+  padding: var(--sp-9) 0;
+
+  .code { font-size: var(--step-4); font-family: var(--font-mono); color: var(--accent); }
+  p { margin-top: var(--sp-4); color: var(--text-dim); }
+  .cta {
+    display: inline-block;
+    margin-top: var(--sp-6);
+    padding: var(--sp-3) var(--sp-5);
+    background: var(--accent);
+    color: var(--accent-ink);
+    border-radius: var(--radius);
+    font-weight: 600;
+  }
+}
+
+/* ── Lightbox ──────────────────────────────────────────────────────────────
+   Careful with `display` here. The UA stylesheet hides a closed dialog with
+   `dialog:not([open]) { display: none }`, but author rules beat the UA sheet
+   whatever the specificity — so declaring `display: grid` on `.lightbox`
+   itself un-hides the closed dialog. It then takes the UA's `width/height:
+   fit-content` around the empty <img>, plus this padding, and the UA's
+   `margin: auto` centres it: a small dark square floating over the article.
+   So `display` is set ONLY in the [open] state, and the box is sized
+   explicitly to beat fit-content. */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  margin: 0;
+  padding: var(--sp-5);
+  background: rgb(6 8 10 / 0.92);
+  backdrop-filter: blur(4px);
+  border: 0;
+
+  &::backdrop { background: transparent; }
+  img {
+    max-width: 100%;
+    max-height: 90vh;
+    width: auto;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+}
+
+.lightbox[open] {
+  display: grid;
+  place-items: center;
+}

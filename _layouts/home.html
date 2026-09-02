@@ -1,0 +1,60 @@
+---
+layout: default
+---
+<header class="hero">
+  <div class="wrap hero-text">
+    <h1 class="hero-title">FullGC</h1>
+    <hr class="hero-rule">
+    <p class="hero-tagline">{{ site.tagline }}</p>
+    <p class="hero-by">by <a href="{{ '/about/' | relative_url }}">{{ site.author.name }}</a></p>
+  </div>
+
+  {%- comment -%}
+    Height-capped rather than cropped, so the whole chart stays intact — it
+    depicts the Full GC event the blog is named after. Eager and
+    high-priority: it is the largest thing above the fold.
+  {%- endcomment -%}
+  <div class="wrap">
+    <img class="hero-chart" src="{{ '/img/fullgc-heap.png' | relative_url }}"
+         width="1024" height="438" alt="JVM heap usage sawtooth ending in a full GC event"
+         fetchpriority="high" decoding="async">
+  </div>
+</header>
+
+<div class="wrap">
+
+  {{ content }}
+
+  {%- comment -%} The six most-used tags, as a scan line into the archive. {%- endcomment -%}
+  <div class="topics">
+    <span class="label mono">TOPICS</span>
+    {%- for tag in site.data.tag_index limit: 6 -%}
+    <a class="tag" href="{{ '/tags/' | append: tag.slug | append: '/' | relative_url }}">{{ tag.name }}</a>
+    {%- endfor -%}
+    <a class="tag tag-all" href="{{ '/tags/' | relative_url }}">all {{ site.data.tag_index | size }} tags &rarr;</a>
+  </div>
+
+  <div class="section-head">
+    <h2>Writing</h2>
+    <span class="count mono">{{ site.posts | size }} posts</span>
+  </div>
+
+  <ul class="post-list">
+    {%- comment -%}
+      Walk newest-first and emit each series only once, at the position of its
+      most recent part, so ordering still reads chronologically.
+    {%- endcomment -%}
+    {%- assign done = '|' -%}
+    {%- for post in site.posts -%}
+      {%- if post.series and post.series != '' -%}
+        {%- assign key = post.series | slugify | prepend: '|' | append: '|' -%}
+        {%- unless done contains key -%}
+          {%- assign done = done | append: key | append: '|' -%}
+          {%- include entry.html post=post -%}
+        {%- endunless -%}
+      {%- else -%}
+        {%- include entry.html post=post -%}
+      {%- endif -%}
+    {%- endfor -%}
+  </ul>
+</div>

@@ -1,8 +1,13 @@
-source 'https://rubygems.org/'
-gem 'jekyll-seo-tag'
-gem 'github-pages', group: :jekyll_plugins
-gem "github-pages", :group => :jekyll_plugins
-gem 'nokogiri'
-gem 'rack', '~> 2.0.1'
-gem 'rspec'
+source "https://rubygems.org"
 
+gem "jekyll", "~> 4.4"
+
+group :jekyll_plugins do
+  gem "jekyll-feed",         "~> 0.17"
+  gem "jekyll-sitemap",      "~> 1.4"
+  gem "jekyll-seo-tag",      "~> 2.8"
+  gem "jekyll-redirect-from", "~> 0.16"
+end
+
+# Windows/JRuby niceties omitted; macOS + Linux CI only.
+gem "webrick", "~> 1.8"

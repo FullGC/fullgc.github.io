@@ -1,0 +1,23 @@
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="{{ '/' | relative_url }}">fullgc</a>
+
+    <nav class="nav" aria-label="Main">
+      <a href="{{ '/' | relative_url }}"        {% if page.url == '/' %}aria-current="page"{% endif %}>Writing</a>
+      <a href="{{ '/tags/' | relative_url }}"   {% if page.url == '/tags/' %}aria-current="page"{% endif %}>Tags</a>
+      <a href="{{ '/archive/' | relative_url }}" data-optional
+         {% if page.url == '/archive/' %}aria-current="page"{% endif %}>Archive</a>
+      <a href="{{ '/about/' | relative_url }}"  {% if page.url == '/about/' %}aria-current="page"{% endif %}>About</a>
+
+      <span class="nav-icons">
+        <a class="icon-btn" href="{{ '/feed.xml' | relative_url }}" aria-label="RSS feed">
+          <svg aria-hidden="true"><use href="#i-rss"/></svg>
+        </a>
+        <button class="icon-btn theme-toggle" type="button" aria-label="Switch theme">
+          <svg class="i-sun"  aria-hidden="true"><use href="#i-sun"/></svg>
+          <svg class="i-moon" aria-hidden="true"><use href="#i-moon"/></svg>
+        </button>
+      </span>
+    </nav>
+  </div>
+</header>

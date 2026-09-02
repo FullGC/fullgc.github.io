@@ -1,22 +1,20 @@
-.DS_Store
-.jekyll
+# Build output — never commit this again
+_site/
+.jekyll-cache/
 .jekyll-metadata
-.bundle
-.sass-cache
+.sass-cache/
+
+# Ruby
+.bundle/
+vendor/
 Gemfile.lock
-node_modules
-package.json
-fullgc.iml
-.classpath
-.project
-.settings/
+
+# Editors / OS
 .idea/
 *.iml
 *.iws
-log/
-target/
-atlassian*.xml
-log4j.properties
-buildNumber.properties
-log4j.xml
-context.xml
+.vscode/
+.DS_Store
+
+# personal working notes, not site content
+makeover.text

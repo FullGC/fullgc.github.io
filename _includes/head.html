@@ -1,88 +1,115 @@
 <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="{% if page.description %}{{ page.description }}{% else %}{{ site.description }}{% endif %}">
-    <meta name="google-site-verification" content="kqeqeqgU-LfVjSKM8HLKKW3qayexE31nr9xTVwY9N5c" />
+  {%- comment -%}
+    Apply the stored theme before first paint so there is no flash of the
+    wrong palette. Kept inline and tiny on purpose.
+  {%- endcomment -%}
+  <script>
+    try {
+      var t = localStorage.getItem("theme");
+      if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
+    } catch (e) {}
+  </script>
 
-    <title>{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %} | Dani Shemesh</title>
+  <meta name="theme-color" content="#101215" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+  <meta name="google-site-verification" content="kqeqeqgU-LfVjSKM8HLKKW3qayexE31nr9xTVwY9N5c">
 
-    <link rel="canonical" href="{{ page.url | replace:'index.html','' | prepend: site.baseurl | prepend: site.url }}">
+  {%- comment -%} Titles, canonical, OpenGraph, Twitter cards and JSON-LD. Rendered ONCE. {%- endcomment -%}
+  {%- seo -%}
 
-    <!-- Bootstrap Core CSS -->
-    <link rel="stylesheet" href="{{ "/css/bootstrap.min.css" | prepend: site.baseurl }}">
+  {%- comment -%}
+    seo-tag emits og:image itself; these dimensions are what let a scraper
+    render a large card without fetching the file to measure it first.
+  {%- endcomment -%}
+  {%- if page.image_w and page.image_h -%}
+  <meta property="og:image:width" content="{{ page.image_w }}">
+  <meta property="og:image:height" content="{{ page.image_h }}">
+  <meta property="og:image:alt" content="{{ page.image_alt | default: page.title }}">
+  {%- endif -%}
 
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="{{ "/css/clean-blog.css" | prepend: site.baseurl }}">
+  {%- comment -%}
+    Thin tag pages (a single post) are kept crawlable but out of the index, so
+    they don't compete with the post itself for the same query.
+  {%- endcomment -%}
+  {%- if page.noindex -%}
+  <meta name="robots" content="noindex, follow">
+  {%- endif -%}
 
-    <!-- Pygments Github CSS -->
-    <link rel="stylesheet" href="{{ "/css/syntax.css" | prepend: site.baseurl }}">
+  <link rel="alternate" type="application/rss+xml" title="{{ site.title }} — {{ site.tagline }}"
+        href="{{ '/feed.xml' | absolute_url }}">
+  {%- comment -%} ?v= busts the browser cache on every build. {%- endcomment -%}
+  <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}?v={{ site.time | date: '%s' }}">
+  <link rel="icon" href="{{ '/assets/favicon.svg' | relative_url }}" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="{{ '/img/fullgcBig.jpg' | relative_url }}">
 
-    <!-- Custom Fonts -->
-    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
-    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
-    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+  {%- comment -%}
+    Breadcrumb structured data. Gives Google the site > section > post trail
+    that renders under the result title instead of a bare URL.
+  {%- endcomment -%}
+  {%- if page.layout == 'post' -%}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Writing", "item": {{ '/' | absolute_url | jsonify }} },
+      { "@type": "ListItem", "position": 2, "name": {{ page.title | jsonify }}, "item": {{ page.url | absolute_url | jsonify }} }
+    ]
+  }
+  </script>
+  {%- endif -%}
 
-    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-    <![endif]-->
+  {%- if page.url == '/' -%}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    "name": {{ site.title | jsonify }},
+    "url": {{ '/' | absolute_url | jsonify }},
+    "description": {{ site.description | strip_newlines | strip | jsonify }},
+    "inLanguage": "en",
+    "author": {
+      "@type": "Person",
+      "name": {{ site.author.name | jsonify }},
+      "url": {{ '/about/' | absolute_url | jsonify }},
+      "sameAs": {{ site.social.links | jsonify }}
+    },
+    "blogPost": [
+      {%- for post in site.posts -%}
+      {
+        "@type": "BlogPosting",
+        "headline": {{ post.title | jsonify }},
+        "url": {{ post.url | absolute_url | jsonify }},
+        "datePublished": "{{ post.date | date_to_xmlschema }}",
+        "keywords": {{ post.tags | join: ', ' | jsonify }}
+      }{% unless forloop.last %},{% endunless %}
+      {%- endfor -%}
+    ]
+  }
+  </script>
+  {%- endif -%}
 
-    <!-- facebook Open Graph Metadatas -->
-    <meta content="609039549219229" property="fb:app_id">
-    <meta content="{{ site.title }}" property="og:site_name">
-    {% if page.title %}
-      <meta content="{{ page.title }}" property="og:title">
-    {% else %}
-      <meta content="{{ site.title }}" property="og:title">
-    {% endif %}
-    {% if page.title %}
-      <meta content="article" property="og:type">
-    {% else %}
-      <meta content="website" property="og:type">
-    {% endif %}
-    {% if page.description %}
-      <meta content="{{ page.description }}" property="og:description">
-    {% else %}
-      <meta content="{{ site.description }}" property="og:description">
-    {% endif %}
-    {% if page.url %}
-      <meta content="{{ site.url }}{{ page.url }}" property="og:url">
-    {% endif %}
-    {% if page.date %}
-      <meta content="{{ page.date | date_to_xmlschema }}" property="article:published_time">
-      <meta content="{{ site.url }}/about/" property="article:author">
-    {% endif %}
-    {% if page.header-img %}
-      <meta content="{{ site.url }}/{{ page.header-img }}" property="og:image">
-    {% endif %}
-    {% if page.categories %}
-      {% for category in page.categories limit:1 %}
-      <meta content="{{ category }}" property="article:section">
-      {% endfor %}
-    {% endif %}
-    {% if page.tags %}
-      {% for tag in page.tags %}
-      <meta content="{{ tag }}" property="article:tag">
-      {% endfor %}
-    {% endif %}
+  {%- if page.url == '/about/' -%}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": {{ site.author.name | jsonify }},
+    "url": {{ '/about/' | absolute_url | jsonify }},
+    "image": {{ site.author.avatar | absolute_url | jsonify }},
+    "description": {{ site.author.bio | jsonify }},
+    "jobTitle": "Backend & Infrastructure Engineer",
+    "knowsAbout": ["Scala", "Java", "JVM", "Akka", "Kubernetes", "Terraform", "HashiCorp Vault", "DevOps"],
+    "sameAs": {{ site.social.links | jsonify }}
+  }
+  </script>
+  {%- endif -%}
 
-
-    {% if page.url %}
-      <meta name="twitter:url" content="{{ site.url }}{{ page.url }}">
-    {% endif %}
-    {% if page.description %}
-      <meta name="twitter:description" content="{{ page.description }}">
-    {% else %}
-      <meta name="twitter:description" content="{{ site.description }}">
-    {% endif %}
-    {% if page.header-img %}
-      <meta name="twitter:image:src" content="{{ site.url }}/{{ page.header-img }}">
-    {% endif %}
-
-    {% include google_analytics.html %}
-
+  {%- if site.goatcounter and site.goatcounter != '' -%}
+  <script data-goatcounter="https://{{ site.goatcounter }}.goatcounter.com/count"
+          async src="//gc.zgo.at/count.js"></script>
+  {%- endif -%}
 </head>

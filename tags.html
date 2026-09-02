@@ -1,0 +1,23 @@
+---
+layout: default
+title: Tags
+description: Every topic covered on fullgc — Scala, Akka, the JVM, Kubernetes, Consul, Vault, CI/CD and testing.
+permalink: /tags/
+---
+<div class="wrap">
+  <header class="page-header">
+    <span class="kicker mono">INDEX</span>
+    <h1>Tags</h1>
+    <p>{{ site.data.tag_index | size }} topics across {{ site.posts | size }} posts.</p>
+  </header>
+
+  <ul class="tag-cloud">
+    {%- for tag in site.data.tag_index -%}
+    <li>
+      <a class="tag" href="{{ '/tags/' | append: tag.slug | append: '/' | relative_url }}">
+        {{ tag.name }}<span class="n">{{ tag.count }}</span>
+      </a>
+    </li>
+    {%- endfor -%}
+  </ul>
+</div>

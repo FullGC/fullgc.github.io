@@ -1,0 +1,168 @@
+/* ── Long-form article body ──────────────────────────────────────────────── */
+
+.prose {
+  font-size: var(--step-0);
+  line-height: 1.68;
+  color: var(--text);
+
+  > * + * { margin-top: var(--sp-5); }
+
+  /* Avoid single-word last lines in paragraphs. Ignored where unsupported. */
+  p { text-wrap: pretty; }
+
+  /* Headings get extra air above, and an anchor that appears on hover. */
+  h2, h3, h4 {
+    margin-top: var(--sp-8);
+    scroll-margin-top: calc(var(--header-h) + var(--sp-5));
+    position: relative;
+  }
+  h2 {
+    font-size: var(--step-2);
+    padding-bottom: var(--sp-3);
+    border-bottom: 1px solid var(--border-soft);
+  }
+  h3 { font-size: var(--step-1); }
+  h4 { font-size: var(--step-0); font-weight: 700; }
+
+  /* Several posts were exported from Google Docs and wrap headings in <strong>;
+     strip the doubled weight so they don't render heavier than h1. */
+  h2 > strong, h3 > strong, h4 > strong { font-weight: inherit; }
+
+  .anchor {
+    position: absolute;
+    right: 100%;
+    padding-right: 0.35em;
+    color: var(--text-mute);
+    opacity: 0;
+    font-weight: 400;
+    transition: opacity 0.15s var(--ease);
+  }
+  h2:hover .anchor, h3:hover .anchor,
+  .anchor:focus-visible { opacity: 1; }
+  .anchor:hover { color: var(--accent); }
+
+  a:not(.anchor) {
+    color: var(--accent);
+    border-bottom: 1px solid color-mix(in oklab, var(--accent) 35%, transparent);
+    transition: border-color 0.15s var(--ease);
+    &:hover { border-bottom-color: var(--accent); }
+  }
+
+  strong { font-weight: 650; }
+
+  ul, ol { padding-left: 1.35em; }
+  li + li { margin-top: var(--sp-2); }
+  li::marker { color: var(--text-mute); }
+
+  blockquote {
+    padding-left: var(--sp-5);
+    border-left: 2px solid var(--accent-dim);
+    color: var(--text-dim);
+    font-style: normal;
+  }
+
+  /* Inline code */
+  :not(pre) > code {
+    padding: 0.15em 0.4em;
+    background: var(--bg-inset);
+    border: 1px solid var(--border-soft);
+    border-radius: 4px;
+    color: var(--text);
+    word-break: break-word;
+  }
+
+  img { border-radius: var(--radius); border: 1px solid var(--border); margin-inline: auto; }
+
+  figure { text-align: center; }
+  figcaption {
+    margin-top: var(--sp-3);
+    font-size: var(--step--1);
+    color: var(--text-mute);
+  }
+
+  /* Post images opt into click-to-zoom via JS; hint it. */
+  .zoomable { cursor: zoom-in; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--step--1);
+    display: block;
+    overflow-x: auto;
+
+    th, td { padding: var(--sp-3) var(--sp-4); border: 1px solid var(--border); text-align: left; }
+    th { background: var(--bg-elev); font-weight: 650; }
+  }
+}
+
+/* ── Code blocks ─────────────────────────────────────────────────────────── */
+/* Blocks break out wider than the 68ch measure — the Scala and YAML samples
+   in these posts are wide and wrapping them destroys them. */
+
+.prose .highlight,
+.prose > pre {
+  position: relative;
+  margin-inline: calc(var(--bleed, 0px) * -1);
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+@media (min-width: 60rem) {
+  .prose { --bleed: 3rem; }
+}
+
+.prose .highlight pre,
+.prose > pre {
+  margin: 0;
+  padding: var(--sp-5);
+  overflow-x: auto;
+  line-height: 1.6;
+  tab-size: 2;
+
+  code { white-space: pre; }
+}
+
+.code-lang {
+  position: absolute;
+  top: 0; left: 0;
+  padding: 0.2em 0.6em;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+  background: var(--bg-elev);
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  border-bottom-right-radius: var(--radius);
+  pointer-events: none;
+}
+
+.copy-btn {
+  position: absolute;
+  top: var(--sp-2); right: var(--sp-2);
+  z-index: 2;
+  padding: 0.25em 0.6em;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  color: var(--text-mute);
+  background: var(--bg-elev);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  opacity: 0;
+  transition: opacity 0.15s var(--ease), color 0.15s var(--ease);
+
+  &:hover { color: var(--text); }
+  &.is-copied { color: var(--accent); border-color: var(--accent); }
+}
+.prose .highlight:hover .copy-btn,
+.prose .highlight:focus-within .copy-btn,
+.copy-btn:focus-visible { opacity: 1; }
+
+/* Touch devices never hover, so the copy button would stay invisible there. */
+@media (hover: none) {
+  .prose .highlight .copy-btn { opacity: 1; }
+}

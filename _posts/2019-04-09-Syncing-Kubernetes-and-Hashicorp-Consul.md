@@ -1,21 +1,19 @@
 ---
-title: Syncing Kubernetes and Hashicorp Consul
-layout: post
-author: Dani Shemesh
-permalink: /syncing-kubernetes-and-hashicorp-consul/
-tags:
-- kubernetes
-- consul
-- hashicorp
-source-id: 1ohylElOVSjYMeOwHIvte3ECYTIdys03t9Bb803639RY
-published: true
-date: 2019-04-10 14:30:45
-header-img: "img/sync.png"
+title:       "Syncing Kubernetes services with HashiCorp Consul"
+description: >-
+  Sync Consul with Kubernetes services using consul-helm: the chart values that matter,
+  reaching the Consul HTTP API, and resolving the domain in CoreDNS.
+permalink:   /syncing-kubernetes-and-hashicorp-consul/
+date:        2019-04-10 14:30:45
+tags:        [kubernetes, consul, hashicorp]
+image:       /img/sync.png
+image_w:     1920
+image_h:     1080
 ---
 
 If you use Hashicorp's Consul for service discovery/DNS and use (or plan to use) Kubernetes, then the recently announced integration between Consul and Kubernetes will come as welcome news!
 
-![image alt text]({{ site.url }}/public/xXR5gri6PhaGM4U2OMurfQ_img_0.png)
+![Architecture of the Consul and Kubernetes service-sync integration]({{ '/public/xXR5gri6PhaGM4U2OMurfQ_img_0.png' | relative_url }})
 
 The syncing can be done by running a process that is not part of the Kubernetes cluster itself; in Hashicorp's[ consul-k8s project](https://github.com/hashicorp/consul-k8s), or, preferably, by installing the[ Consul-Helm](https://www.consul.io/docs/platform/k8s/run.html) Chart.
 
@@ -26,21 +24,21 @@ There are decisions to be made regarding the nature of the syncing, but the firs
 Before installing the Helm Chart, let's review some of the essential configurations that are found in the standard helm values file, "values.yaml".
 
 <br><br>
-### Configure consul-helm
+## Configure consul-helm
 
 By default, the Chart resolution installs everything: a Consul server cluster, client agents on all nodes, and feature components.
 
 If you already maintain a Consul cluster and are interested in joining the Kubernetes services to your existing cluster, then the “enable” property in the “server” section should be set to “false”:
 
-![image alt text]({{ site.url }}/public/xXR5gri6PhaGM4U2OMurfQ_img_1.png)
+![consul-helm values file with the Consul server enable property turned off]({{ '/public/xXR5gri6PhaGM4U2OMurfQ_img_1.png' | relative_url }})
 
 We'll also need to enable the Consul client and tell it what the Consul-server address is, so it can join the cluster:
 
-![image alt text]({{ site.url }}/public/xXR5gri6PhaGM4U2OMurfQ_img_2.png)
+![consul-helm values enabling the Consul client and pointing it at the Consul server address]({{ '/public/xXR5gri6PhaGM4U2OMurfQ_img_2.png' | relative_url }})
 
 We'll also need to specify the datacenter:
 
-![image alt text]({{ site.url }}/public/xXR5gri6PhaGM4U2OMurfQ_img_3.png)
+![consul-helm values specifying the Consul datacenter]({{ '/public/xXR5gri6PhaGM4U2OMurfQ_img_3.png' | relative_url }})
 
 Now we have to choose whether to sync to Kubernetes or Consul (or both!).
 
@@ -52,7 +50,7 @@ Sync to Kubernetes means that services in Consul can be made available as first-
 
 For example, in the image below we'll define a syncing to Consul and not to Kubernetes.
 
-![image alt text]({{ site.url }}/public/xXR5gri6PhaGM4U2OMurfQ_img_4.png)
+![syncCatalog configured to sync Kubernetes services into Consul but not the reverse]({{ '/public/xXR5gri6PhaGM4U2OMurfQ_img_4.png' | relative_url }})
 
 I recommend going over the entire "values.yaml" file and set the relevant values.
 
@@ -61,7 +59,7 @@ Now for the installation itself:
 Clone the repository from[ here](https://github.com/hashicorp/consul-helm) and perform "helm install".
 
 <br><br>
-### Accessing the Consul HTTP API
+## Accessing the Consul HTTP API
 
 Access to the Consul HTTP API is through the consul-agent, Pod, we've created.
 
@@ -98,7 +96,7 @@ spec:
 ````
 
 <br><br>
-### Configure the Consul domain with the CoreDNS
+## Configure the Consul domain with the CoreDNS
 
 CoreDNS is a DNS server that commonly serves as the Kubernetes cluster DNS.
 It can be configured via its "Corefile", which is defined in the “coredns” ConfigMap.
@@ -160,22 +158,3 @@ kubectl get pods -n kube-system -oname |grep coredns |xargs kubectl apply -f kub
 ````
 
 *Configurations of the Consul-K8s sync components are implemented as Jenkins-Pipeline methods on my [GitHub](https://github.com/FullGC/consul-kubernetes-sync-Pipeline)*.
-
-<div id="disqus_thread"></div>
-<script>
-
-/**
-*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
-*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
-var disqus_config = function () {
-this.page.url = "https://fullgc.github.io/syncing-kubernetes-and-hashicorp-consul/"
-this.page.identifier = consul-kubernetes
-};
-(function() { // DON'T EDIT BELOW THIS LINE
-var d = document, s = d.createElement('script');
-s.src = 'https://FullGC.disqus.com/embed.js';
-s.setAttribute('data-timestamp', +new Date());
-(d.head || d.body).appendChild(s);
-})();
-</script>
-<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>

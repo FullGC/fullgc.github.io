@@ -1,41 +1,90 @@
-# Site settings
-title: FullGC
-email: dani.shemesh@hotmail.com
-author:
-description: "The FullGC blog. Practical guides for the Backend guy. We speak Scala, Java and DevOps"
-baseurl: ""
-url: "http://fullgc.github.io"
-github_username: FullGC
-linkedin_username: dani-shemesh
-facebook: dani.shemesh.397
-email: dani.shemesh@hotmail.com
-# Build settings
-markdown: kramdown
-highlighter:
-permalink: pretty
-paginate: 5
-exclude: ["node_modules"]
+# ─── Identity ────────────────────────────────────────────────────────────────
+title:            fullgc
+tagline:          "Practical guides for the backend guild"
+description:      >-
+  Practical, in-depth engineering write-ups on Scala, the JVM, Akka, Kubernetes,
+  Consul and HashiCorp Vault — by Dani Shemesh, backend and infrastructure engineer.
+url:              "https://fullgc.github.io"
+baseurl:          ""
+lang:             en_US
+timezone:         Asia/Jerusalem
 
-gems:
-  - jekyll-sitemap
-  - jekyll-seo-tag
+author:
+  name:    Dani Shemesh
+  email:   dani.shemesh@hotmail.com
+  bio:     Backend & infrastructure engineer. I write about the JVM, Scala, and the systems around them.
+  avatar:  /img/me-about.jpg
+
+# Used by jekyll-seo-tag for schema.org sameAs + the footer links
+social:
+  name:  Dani Shemesh
+  links:
+    - https://github.com/FullGC
+    - https://www.linkedin.com/in/dani-shemesh
+
+github_username:   FullGC
+linkedin_username: dani-shemesh
+
+# ─── Third party (leave blank to disable entirely) ───────────────────────────
+# GoatCounter: the subdomain of your goatcounter.com site code.
+goatcounter: ""
+
+# giscus: fill these in from https://giscus.app after enabling Discussions.
+giscus:
+  repo:        "FullGC/fullgc.github.io"
+  repo_id:     ""
+  category:    "Comments"
+  category_id: ""
+
+# ─── Build ───────────────────────────────────────────────────────────────────
+markdown:    kramdown
+highlighter: rouge
+permalink:   pretty
+sass:
+  style: compressed
+  sourcemap: never
+
+kramdown:
+  input: GFM
+  hard_wrap: false
+  auto_ids: true
+  syntax_highlighter: rouge
+  syntax_highlighter_opts:
+    block:
+      line_numbers: false
 
 plugins:
+  - jekyll-feed
+  - jekyll-sitemap
   - jekyll-seo-tag
+  - jekyll-redirect-from
 
-disqus: FullGC
+feed:
+  path: feed.xml   # keep the historical /feed.xml path for existing subscribers
 
-footer-links:
-  dribbble:
-  email: dani.shemesh@hotmail.com
-  facebook: dani.shemesh.397
-  flickr:
-  github: FullGC
-  instagram:
-  linkedin: dani-shemesh
-  pinterest:
-  rss: # just type anything here for a working RSS icon
-  twitter:
-  stackoverflow: # your stackoverflow profile, e.g. "users/50476/bart-kiers"
-  youtube: # channel/<your_long_string> or user/<user-name>
-  googleplus: # anything in your profile username that comes after plus.google.com/
+defaults:
+  - scope:  { path: "", type: posts }
+    values:
+      layout:   post
+      author:   Dani Shemesh
+      comments: true
+  - scope:  { path: "" }
+    values:
+      layout: page
+  # Google Search Console verification stub — not a page, keep it out of the sitemap.
+  - scope:  { path: "google4218bf4e7ccc7bff.html" }
+    values:
+      sitemap: false
+      layout: null
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - vendor
+  - node_modules
+  - README.md
+  - LICENSE
+  - makeover.text
+  - drafts
+  - "*.iml"
+  - .idea

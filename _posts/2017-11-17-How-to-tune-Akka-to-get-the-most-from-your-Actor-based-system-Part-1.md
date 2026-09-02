@@ -1,32 +1,24 @@
 ---
-title: How to tune Akka to get the most from your Actor-based system - Part 1
-layout: post
-author: "Dani Shemesh"
-permalink: /how-to-tune-akka-to-get-the-most-from-your-actor-based-system-part-1/
-comments: true
-tags:
-- scala
-- akka
-source-id: 1iQAan2An0EVwukuK4r_L1rS6pCgLCtIVCp0qVxOZ-dk
-published: true
-date: 2018-07-25 14:20:45
-header-img: "img/tune-Akka.jpg"
+title:       "How to tune Akka for actor-based systems — Part 1"
+part_title:  "Initial Akka configurations"
+description: >-
+  Akka dispatcher tuning: how many actor instances to run, which routing strategy fits
+  which load, and how to size the fork-join and thread-pool executors.
+permalink:   /how-to-tune-akka-to-get-the-most-from-your-actor-based-system-part-1/
+date:        2018-07-25 14:20:45
+series:      "Tuning Akka for Actor-based Systems"
+part:        1
+tags:        [scala, akka]
+image:       /img/tune-Akka.jpg
+image_w:     1200
+image_h:     800
 ---
-
-<i>This post is the first of a two parts series of articles about how to tune Akka configurations</i>
-
-* [Part-1: Initial Akka Configurations](https://fullgc.github.io/how-to-tune-akka-to-get-the-most-from-your-actor-based-system-part-1)
-* [Part-2: Gather and analyze Akka metrics with Kamon and stackable traits](https://fullgc.github.io/how-to-tune-akka-to-get-the-most-from-your-actor-based-system-part-2)
-
-------------------------------------------------------------------------------------------
 
 At some point, whether it is during your new actor-based system planning, or after you have a prototype working, you'll probably find yourself digging into the [Akka Docs](https://doc.akka.io/docs/akka/2.5/scala/index.html) to find the right combination of possibilities for routing, dispatcher, number of actors instances and so forth...
 Depending on the complexity of your system and performance requirements, this could get tedious.
 
 <br><br>
-## Part-1: Initial Akka Configurations
-
-Let’s start with Akka configuration, specifically the configuration of [actor-instances](#heading=h.hhztx0701fu1), [routing strategy](#heading=h.cuvgdmxiz64e) and [dispatchers & executors](#heading=h.no1l9o35uyp0). Below is the relevant section of the application.conf
+Let’s start with Akka configuration, specifically the configuration of actor-instances, routing strategy and dispatchers & executors. Below is the relevant section of the application.conf
 
 ````
  {
@@ -45,7 +37,7 @@ Let’s start with Akka configuration, specifically the configuration of [actor-
 ````
 
 <br><br>
-### **The number of actor instances**
+## **The number of actor instances**
 
 I like to start by thinking about how many instances of an actor are suitable?
 ````
@@ -59,7 +51,7 @@ I like to start by thinking about how many instances of an actor are suitable?
 The size may depend on other configurations like routing strategy, dispatcher, threadpool size and more. Nevertheless, the nr-of-actor ‘strategy' can already be decided at this point.
 Let’s review our options and use cases:
 
-#### Single instance (or- Domain actor)
+### Single instance (or- Domain actor)
 
 * A dedicated actor for low-priority side-effects like sending metrics, write to a log or to a cache and so forth.
 * A mutable, single-source that needs to be handled(Cache)
@@ -67,14 +59,14 @@ Let’s review our options and use cases:
 
 
 
-#### Fixed number of instances
+### Fixed number of instances
 
 * Instance per a copy of resource, or per a mutable resource
 * For sharding, i.e. when you manage a distributed key-value cache and want to shard the inputs, then you may want an actor to manage each shard
 * To execute tasks in parallel, and you don’t think you’ll need to manage [Back-Pressure](https://www.reactivemanifesto.org/glossary) nor to scale up
 
 
-#### Resizeable number of instances(when using a router)
+### Resizeable number of instances(when using a router)
 ````
 akka.actor.deployment {
   /parent/router {
@@ -93,7 +85,7 @@ It is possible to configure resizable routees (actor instances managed by a rout
 
 Routees can be added or removed dynamically, based on performance. You can configure specifically how much to scale up and down in case of unusual behavior.
 
-##### Scale /  [Back-Pressure](https://www.reactivemanifesto.org/glossary) DIY!
+#### Scale /  [Back-Pressure](https://www.reactivemanifesto.org/glossary) DIY!
 
 When one component is struggling to keep-up, the entire system needs to respond in a sensible way.
 
@@ -102,8 +94,8 @@ You’re might be somewhat familiar wit [Akka-Streams](https://doc.akka.io/docs/
 Let’s review some scenarios in which you may want to scale your routees:
 
 
-###### *The producer(In our use case, one of your actors), can produce faster than the received consumer(actor or any other source) can handle.*
-<img align="right" src="/img/loaded.png" height="290" width="290">
+##### *The producer(In our use case, one of your actors), can produce faster than the received consumer(actor or any other source) can handle.*
+<img align="right" src="/img/loaded.png" height="290" width="290" alt="An overloaded actor mailbox">
  In this case you may:
 
 * Back-pressure the producer, i.e. reduce the number of producer's routees.
@@ -112,8 +104,8 @@ Let’s review some scenarios in which you may want to scale your routees:
 
 * Leave it. You don’t necessarily need to back-pressure. It may lead to a loss of messages (bounded mailbox) or running out of memory...
 
-<img align="right" src="/img/easy.png" height="290" width="290">
-###### *The consumer is faster than the producer.*
+<img align="right" src="/img/easy.png" height="290" width="290" alt="A comfortably loaded actor">
+##### *The consumer is faster than the producer.*
 
 Here the consumer will block waiting for the next item.
 
@@ -123,8 +115,8 @@ Here the consumer will block waiting for the next item.
 
 * Leave it. Then you may not get the most from your machine.
 
-#### Actor per-request
-<img align="right" src="/img/meeseeks.png" height="100" width="100">
+### Actor per-request
+<img align="right" src="/img/meeseeks.png" height="100" width="100" alt="Mr. Meeseeks, standing in for a short-lived actor instance">
 <span style="font-weight: 400;">“</span><i><span style="font-weight: 400;">You press, you make a request, the </span></i><a href="https://en.wikipedia.org/wiki/Meeseeks_and_Destroy"><i><span style="font-weight: 400;">Meeseeks</span></i></a><i><span style="font-weight: 400;"> fulfills the request, and then it stops existing”(</span></i><a href="https://en.wikipedia.org/wiki/Rick_Sanchez_(Rick_and_Morty)"><i><span style="font-weight: 400;">Rick Sanchez</span></i></a><i><span style="font-weight: 400;">)</span></i>
 
 Actor per request works very similarly. An instance is created for every request, process it and then it will be destroyed.
@@ -133,12 +125,12 @@ You can configure Spray/Akka-HTTP to work in actor-per-request mode or do it you
 
 * Easy to manage state in the actor, because the context is always of a specific request, hence you don’t have to maintain any mapping of State => Request
 
-* [And here are some more insights](http://techblog.net-a-porter.com/2013/12/ask-tell-and-per-request-actors/)
+* [And here are some more insights](https://web.archive.org/web/20190715225042/http://techblog.net-a-porter.com/2013/12/ask-tell-and-per-request-actors/)
 
 Note that there is a context-switches overhead which could theoretically lead to memory issues
 
 <br><br>
-### **Routing**
+## **Routing**
 
 Akka provides “strategies” for the Akka router to define the workload distribution among actors.
 ````
@@ -150,7 +142,7 @@ akka.actor.deployment {
 ````
 
 
-#### Strategies Overview
+### Strategies Overview
 
 Let's quickly review the the routing strategies
 * **Random** - Distributes messages randomly
@@ -170,9 +162,9 @@ Let's quickly review the the routing strategies
 * **In-Code** - Custom your own routing by routing it yourself
 
 
-#### *Strategies Cheatsheet*
+### *Strategies Cheatsheet*
 
-![image alt text]({{ site.url }}/img/routingstrategies.jpg)
+![Cheatsheet comparing Akka routing strategies and when each one applies]({{ '/img/routingstrategies.jpg' | relative_url }})
 
 *Can be solved by increasing the number of routees (which may cost in context-switches overhead)
 
@@ -182,7 +174,7 @@ Let's quickly review the the routing strategies
 
 
 <br><br>
-### **Dispatchers and Executors**
+## **Dispatchers and Executors**
 ````
 akka.actor.deployment {
     /my-service {
@@ -201,7 +193,7 @@ my-dispatcher {
 }
 ````
 
-#### Fork-Join-executor
+### Fork-Join-executor
 
 ````
 my-dispatcher {
@@ -249,7 +241,7 @@ my-dispatcher {
 ````
 
 A common case is to use Fork-Join executor for future tasks inside an actor. Here, the dispatcher’s configuration of the actor should be considered as well. For example, the more threads you have for the actor, the more ‘future’ tasks will be performed, and you may want more threads for them.
-#### Thread-pool-executor
+### Thread-pool-executor
 
 The old Java 5 executor for asynchronous task execution can still fit in some cases and without the Fork-Join overhead.
 
@@ -282,7 +274,7 @@ The key is to find the right balance for actor instances to work in parallel and
 Do not use it if you have more instances than the number of cores in the machine.
 It is also not recommended for Futures, because you’ll probably need more than 1 thread...
 
-#### Affinity-pool-executor
+### Affinity-pool-executor
 
 ````
 my-dispatcher {
@@ -295,36 +287,18 @@ This executor tries its best to have your actor instance always schedule with th
 
 This is recommended for a small number of actor instances, where you have much more instances than threads, it is just not possible.
 
-#### Tips
-<img align="right" src="/img/dispatcher.jpg" height="250" width="250">
+### Tips
+<img align="right" src="/img/dispatcher.jpg" height="250" width="250" alt="Akka dispatcher assigning actors to threads">
 * Don't use the [Akka default dispatcher](https://doc.akka.io/docs/akka/2.5/scala/dispatchers.html) for your actorSystem, or for the actors themselves. Note that external Akka based frameworks use it as default, and you should configure a dedicated dispatcher for them as well.
 
 * Have a different dispatcher for each actor, and for Futures inside an actor.
 
 * Dispatchers have a ‘throughput’ parameter, which "*defines the maximum number of messages to be processed per actor before the thread jumps to the next actor"* Setting It to a higher value than the default, 1, is likely to improve performance so long as it is not part of the Affinity-pool dispatcher, and your actors are generally not very busy (otherwise the lack of fairness can cause a high load in some mailboxes).
 
-* Read [this terrific post in the ScalaC blog](https://blog.scalac.io/improving-akka-dispatcher.html). It explains dispatcher’s internals in details.
+* Read [this terrific post in the ScalaC blog](https://scalac.io/blog/improving-akka-dispatchers/). It explains dispatcher’s internals in details.
 
 <br><br>
-### **Next**
+## **Next**
 
-In [Part-2](https://fullgc.github.io/how-to-tune-akka-to-get-the-most-from-your-actor-based-system-part-2) I will show how we monitor and analyze our actor-based system.
+In [Part-2]({{ '/how-to-tune-akka-to-get-the-most-from-your-actor-based-system-part-2/' | relative_url }}) I will show how we monitor and analyze our actor-based system.
 
-<div id="disqus_thread"></div>
-<script>
-
-/**
-*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
-*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
-var disqus_config = function () {
-this.page.url = "https://fullgc.github.io/how-to-tune-akka-to-get-the-most-from-your-actor-based-system-part-1/"
-this.page.identifier = Akka-1
-};
-(function() { // DON'T EDIT BELOW THIS LINE
-var d = document, s = d.createElement('script');
-s.src = 'https://FullGC.disqus.com/embed.js';
-s.setAttribute('data-timestamp', +new Date());
-(d.head || d.body).appendChild(s);
-})();
-</script>
-<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>

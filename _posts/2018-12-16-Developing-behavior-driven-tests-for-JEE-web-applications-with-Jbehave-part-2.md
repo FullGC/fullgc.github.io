@@ -1,34 +1,24 @@
 ---
-title: Developing behavior-driven tests for JEE web applications with Jbehave - Part 2
-layout: post
-author: Dani Shemesh
-permalink: /developing-behavior-with-jbehave-part-2/
-tags:
-- jee
-- java
-- jbehave
-- bdd
-- automation
-- tests
-date: 2018-12-19 14:10:45
-published: true
-header-img: "img/behave-color.jpg"
+title:       "Behavior-driven tests for JEE with JBehave — Part 2"
+part_title:  "Writing stories and Java implementation"
+description: >-
+  Writing JBehave stories and the Java step implementations behind them, worked through
+  end to end with a complete user-registration story for a JEE app.
+permalink:   /developing-behavior-with-jbehave-part-2/
+date:        2018-12-19 14:10:45
+series:      "Behavior-driven Tests for JEE with JBehave"
+part:        2
+tags:        [jee, java, jbehave, bdd, automation, tests]
+image:       /img/behave-color.jpg
+image_w:     1016
+image_h:     594
 ---
 
-<i>This post is the second of a three parts series of articles about Developing behavior-driven tests for JEE web applications with Jbehave</i>
-
-* [Part-1: Terminology, Tools and the 'Volcano' stories](https://fullgc.github.io/developing-behavior-with-jbehave-part-1)
-* [Part-2: Writing Stories and Java Implementation](https://fullgc.github.io/developing-behavior-with-jbehave-part-2)
-* [Part-3: Automate the tests and generate reports](https://fullgc.github.io/developing-behavior-with-jbehave-part-3)
-
-------------------------------------------------------------------------------------------
-
 <br><br>
-## Part 2 - Writing Stories and Java Implementation
 Following is a discussion of some Volcano test cases and their Java implementation.
 
 -----------------------------------------------------------------------------------
-### Registration story
+## Registration story
 
 Let's zoom in on the first story, which is the Volcano registration story file:
 
@@ -89,7 +79,7 @@ public void logIn(@Named("user")String user, @Named("ableorNotAble")String ableO
 ````
 
 <br><br>
-#### Implementation challenges
+### Implementation challenges
 
 Note that, we have used a cache to store the new user's details in the registration step.
 
@@ -106,15 +96,15 @@ Now, we like to:
 This brings up unexpected challenges from an OOP point of view. Before discussing them, let's explain why
 
 <br><br>
-#### The Jbehave environment
-<img src="/img/oop_meme.png" height="190" width="250">
+### The Jbehave environment
+<img src="/img/oop_meme.png" height="190" width="250" alt="Object-oriented inheritance meme">
 
 Though we are writing in Java, we are not in an OOP scope, but in Jbehave's.
 
 When JBehave starts up, it registers all the implemented methods and their parameters, then reads the steps in each scenario for each story and maps them to the appropriate method in the code behind. Here all their values are in memory and are executed one by one. The memory is cleaned after each story.
 
 <br><br>
-#### Re-use the @Given methods
+### Re-use the @Given methods
 
 This one is easy. Instead of inheritance/composition, we can place the @Given methods wherever we like, and Jbehave will identify it. So, we'll create a dedicated class for given methods, dealing with user scenarios:
 
@@ -135,7 +125,7 @@ public void logIn(@Named("user") String user) throws IOException {
 ````
 
 <br><br>
-##### Implement tests for similar entities in the same class
+#### Implement tests for similar entities in the same class
 
 We can once again take advantage of the Jbehave environment to place test implementations with similar characters together, even if they implement steps of different stories, for example:
 
@@ -161,15 +151,15 @@ public class UserAccount {
 ````
 
 <br><br>
-##### Re-use actions with Dependency Injection using Spring
+#### Re-use actions with Dependency Injection using Spring
 
 In order to reuse actions, in our case the user that we have created and logged in with, in the "registration" step, we need to cache. We cannot put the cache in a global variable or static at some place, since we are working with different classes and the memory cleans up after each story.
 
 Luckily, [Jbehave supports some of the most popular, Java based, dependency injection plugins](https://jbehave.org/reference/latest/dependency-injection.html). The most popular is probably Spring, and we'll use it to inject the resources (i.e. the cache) we need for reusing actions.
 
-<img src="/public/dB6XOsGGWuUM1t1RHDV3g_img_5.png" height="190" width="250">
+<img src="/public/dB6XOsGGWuUM1t1RHDV3g_img_5.png" height="190" width="250" alt="JBehave story and step definition side by side">
 
-###### Configure Spring
+##### Configure Spring
 
 We'll use 'org.springframework’ artifacts for the Spring integration:
 
@@ -257,5 +247,5 @@ The spring context:
 ````
 
 <br><br>
-### Next
-In [Part-3](https://fullgc.github.io/developing-behavior-with-jbehave-part-3) we'll learn how to launch the web app in compile time, run the tests and generate summary reports.
+## Next
+In [Part-3]({{ '/developing-behavior-with-jbehave-part-3/' | relative_url }}) we'll learn how to launch the web app in compile time, run the tests and generate summary reports.

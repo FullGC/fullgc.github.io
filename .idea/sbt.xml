@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="ScalaSbtSettings">
-    <option name="customLauncherPath" value="$USER_HOME$/Music" />
-    <option name="customVMPath" value="/usr/lib/jvm/java-8-oracle" />
-  </component>
-</project>
