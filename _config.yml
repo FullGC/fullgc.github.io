@@ -92,6 +92,7 @@ exclude:
   - README.md
   - LICENSE
   - makeover.text
+  - temp
   - drafts
   - "*.iml"
   - .idea

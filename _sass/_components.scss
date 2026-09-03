@@ -545,3 +545,24 @@
   display: grid;
   place-items: center;
 }
+
+/* ── Floated in-body image (memes, small asides) ──────────────────────────
+   Sits right of the text at a fixed 320px so the remaining column keeps a
+   readable measure. Below 40rem there is no room to float anything: it
+   becomes a normal full-width block. */
+.post-body img.float-right {
+  float: right;
+  width: 320px;
+  max-width: 46%;
+  margin: var(--sp-1) 0 var(--sp-4) var(--sp-5);
+  border-radius: var(--radius);
+}
+
+@media (max-width: 40rem) {
+  .post-body img.float-right {
+    float: none;
+    width: 100%;
+    max-width: 100%;
+    margin: var(--sp-5) 0;
+  }
+}

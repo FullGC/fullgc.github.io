@@ -48,7 +48,8 @@ layout: default
     front matter when a particular image actually carries meaning.
     Not lazy-loaded: it is above the fold, where lazy-loading only delays it.
   {%- endcomment -%}
-  {%- if page.image -%}
+  {%- comment -%} banner: false keeps the image as og:image without cropping it on the page {%- endcomment -%}
+  {%- if page.image and page.banner != false -%}
   <figure class="post-banner">
     <img src="{{ page.image | relative_url }}" width="1200"
          alt="{{ page.image_alt | default: '' }}" decoding="async">

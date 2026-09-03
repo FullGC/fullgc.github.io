@@ -18,3 +18,6 @@ Gemfile.lock
 
 # personal working notes, not site content
 makeover.text
+
+# in-progress article drafts and their source figures
+temp/
