@@ -10,6 +10,10 @@ date:        2026-09-03 05:00:00
 series:      "Designing Agentic Development Workflows"
 part:        6
 tags:        [ai, agents, workflows, automation, claude-code]
+image:       /public/agentic-workflow-enforcement-gap.jpeg
+banner:      false
+image_w:     1400
+image_h:     560
 ---
 
 Five parts of design, and design flatters itself. This one does not.
@@ -32,6 +36,10 @@ lesson: an instruction to a language model is a strong default, never a guarante
 load-bearing needs a script behind it.
 
 ![A skeleton sitting on a park bench, having waited so long it died. Caption: "Me, returning to the terminal three hours later." The terminal reads: "Shall I carry on?"]({{ '/public/agentic-workflow-meme-shall-i-carry-on.jpg' | relative_url }}){: .meme}
+
+![Five rules in a row. Three are backed by a script and hold. Two are backed only by prose, and both were skipped on a real run.]({{ '/public/agentic-workflow-enforcement-gap.jpeg' | relative_url }})
+
+*Figure 1: Every rule that mattered and was not a script eventually got skipped. The amber columns are the ones that had only an instruction behind them.*
 
 **Uniformity decays.** In a family built over months, one workflow guards every seam and another guards
 none; one dispatches its work as tiered agents while another invokes the same steps inline, where they

@@ -36,6 +36,11 @@ of what to build first.
 At some point this stops being configuration on your machine and becomes something other people install.
 That step forces a decision the design has been able to defer: what is the unit of distribution?
 
+A note on words, because the two get used interchangeably and they are not the same. This section says
+**package** for the general idea, since the argument holds whatever your harness calls it. Every
+concrete example is a **plugin**, which is Claude Code's implementation of one. Where something is
+true only of plugins rather than of packaging in general, it is called out.
+
 ### What a package can hold
 
 ![Patrick Star from SpongeBob, mid-idea, proposing: "Why don't we take the whole family... and put it in ONE plugin?"]({{ '/public/agentic-workflow-meme-one-plugin.jpg' | relative_url }}){: .meme}
@@ -46,10 +51,16 @@ monitors, executables that go on `PATH` while it is enabled, default settings, a
 configuration it asks the user for at install time. It can also carry arbitrary payload (dashboards, docs, scripts) and reference its own files through `${CLAUDE_PLUGIN_ROOT}`, with `${CLAUDE_PLUGIN_DATA}`
 for state that must survive updates.
 
-That matters more than it sounds: it means a workflow's whole apparatus can travel as one unit: the orchestrator, the skills it composes, its agents, the hooks that measure it, and the dashboard that
-reads them. Not just the prompts. See the
+That matters more than it sounds. A workflow's whole apparatus can travel as one unit: the
+orchestrator, the skills it composes, its agents, the hooks that measure it, and the dashboard that
+reads what they emit. Not just the prompts. The dashboard is the odd one out, riding along as plain
+files rather than as something the runtime loads, which is what `${CLAUDE_PLUGIN_ROOT}` is for. See the
 [plugins guide](https://code.claude.com/docs/en/plugins.md) and
 [reference](https://code.claude.com/docs/en/plugins-reference.md).
+
+![A single package. Its upper half holds the components the runtime loads: skills, agents, hooks, commands and MCP servers. Its lower half holds files that merely ride along, a dashboard and docs. One arrow delivers the whole package to a team in one install.]({{ '/public/agentic-workflow-package-contents.jpeg' | relative_url }})
+
+*Figure 1: One install brings the whole apparatus. The runtime loads the top row; the bottom row rides along as files, which is why a bundled dashboard has to find itself through `${CLAUDE_PLUGIN_ROOT}`.*
 
 ### One package, or one per workflow?
 
@@ -233,7 +244,7 @@ orchestration, the less portable it is.
 
 ![Two harnesses; the lower layer of skills, artifacts, scripts and gates crosses intact, while the upper layer of sub agents, hooks, model tiers and permissions must be rebuilt.]({{ '/public/agentic-workflow-harness-port.jpeg' | relative_url }})
 
-*Figure 1: The file based half ports for free. The orchestration half is the port.*
+*Figure 2: The file based half ports for free. The orchestration half is the port.*
 
 ### The one rule that buys portability
 
@@ -340,7 +351,7 @@ means removing the *approval* step from reversible work, never from irreversible
 
 ![The same pipeline today and when autonomous. The plan gate slot keeps its size and position but its approver changes from a human to a policy script, which escalates to a human when a plan touches a protected file, exceeds the size budget, adds a dependency or carries an open question. Both approvers write the same hash into the same approval log. The publish gate stays human in both rows, and four actions are never automated.]({{ '/public/agentic-workflow-gates-move.jpeg' | relative_url }})
 
-*Figure 2: The gates move; they do not disappear. A policy approves the ordinary plan through the same recorded mechanism a human would use, so the gate check never learns there was nobody there, and the publish gate never changes hands at all.*
+*Figure 3: The gates move; they do not disappear. A policy approves the ordinary plan through the same recorded mechanism a human would use, so the gate check never learns there was nobody there, and the publish gate never changes hands at all.*
 
 ### What must be true first
 

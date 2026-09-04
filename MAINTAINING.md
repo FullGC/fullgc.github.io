@@ -175,20 +175,91 @@ Preview with `make drafts`. `_drafts/akka.md` is there from 2019.
 
 ## 6. After publishing a post
 
-1. **Check the deploy** — [Actions](https://github.com/FullGC/fullgc.github.io/actions).
-   Green means live. Red usually means html-proofer found a broken link.
-2. **Look at the live page** — title, banner, table of contents, code blocks,
-   and the comment box at the bottom.
-3. **Search Console → URL Inspection** — paste the new post's full URL, then
-   **Request Indexing**. This is the single highest-value step; without it Google
-   may take weeks. Quota is ~10–12 URLs/day.
-   - Also re-request `/` so the new post is discovered via the home page.
-4. **The sitemap needs no action** — regenerated on every build and already
-   submitted. `robots.txt` points at it.
-5. **Share the link.** Referral traffic is what actually moves a new post;
-   search takes weeks. The OpenGraph card is already set from `image`.
-6. **A few days later, check [GoatCounter](https://dani-fullgc.goatcounter.com)** —
-   pageviews and referrers tell you whether it landed.
+### Confirm it shipped
+
+```sh
+gh run list --limit 3                    # green?
+gh run watch <run-id> --exit-status      # or wait for it
+gh run view  <run-id> --log-failed       # if it went red
+```
+
+The whole run takes about 90 seconds. **Red is almost always html-proofer finding
+a broken internal link** — a typo in a `relative_url`, or an image you referenced
+but never committed. The old site stays up, so nothing is on fire, but nothing
+new ships until it's fixed.
+
+### Look at the live page, not the local preview
+
+Some things only break in production:
+
+- [ ] **Images all load.** A path that works locally 404s live if the file wasn't
+      `git add`ed — untracked files are invisible to the build.
+- [ ] **The banner / social image** resolves.
+- [ ] **Code blocks** have their language label and copy button.
+- [ ] **The table of contents** lists every `##`.
+- [ ] **Dark and light both look right.** Toggle it; the two palettes are separate.
+- [ ] **Narrow window or phone:** floats unfloat, wide tables scroll instead of
+      pushing the page sideways.
+- [ ] **The comment box renders** at the bottom.
+- [ ] **It's on the home page** — and if it's a series, nested under the series
+      entry rather than listed separately.
+
+### Check the social card *before* you share it
+
+Built from `image`, `image_w`, `image_h`. A post with no `image` silently gets a
+text-only card, which is easy to ship by accident and impossible to fix in a link
+someone already posted.
+
+```sh
+curl -s https://fullgc.github.io/your-post/ | grep -E 'og:(image|title|description)'
+```
+
+Then run the URL through a validator — each service caches aggressively, so check
+before posting, not after:
+
+- <https://www.linkedin.com/post-inspector/>
+- Slack or WhatsApp: paste into a message to yourself
+- X: post-composer preview
+
+### Search Console — the highest-value step
+
+Without it Google may take weeks. With it, usually a few days.
+
+1. <https://search.google.com/search-console>, property `https://fullgc.github.io/`
+2. Paste the post's full URL into the search bar at the top. That *is* URL Inspection.
+3. "URL is not on Google" is the expected answer for something new.
+4. **Request Indexing**, wait for the live test, confirm.
+5. Re-request `/` as well, so the post is reachable from a page Google already crawls often.
+
+Quota is roughly 10–12 URLs a day, so don't request every part of a series at once.
+The new part plus the home page is enough; the older parts get re-crawled anyway
+because they now link to it.
+
+**The sitemap needs no action.** It is regenerated on every build, already
+submitted, and `robots.txt` points at it.
+
+### If it's part of a series
+
+- [ ] The **prev/next pager** on the neighbouring parts now includes it.
+- [ ] The **series entry on the home page** shows the right number of parts.
+- [ ] **Forward references still point at the right part.** If an earlier post says
+      "part five covers X" and you have since inserted a part, that sentence is now
+      wrong and nothing will warn you.
+
+### New tags
+
+Every tag generates `/tags/<slug>/`. A tag used by exactly one post is marked
+`noindex` as thin content — deliberate, not a bug. If you introduced a new tag,
+either reuse it in the next post or accept that its page won't rank.
+
+### A few days later
+
+- **[GoatCounter](https://dani-fullgc.goatcounter.com)** — pageviews, and more
+  usefully *referrers*. Referral traffic is what actually moves a new post; search
+  takes weeks to build up.
+- **Search Console → Performance** — impressions arrive before clicks. Impressions
+  with no clicks usually means a weak `title` or `description`. Both are safe to
+  rewrite after publishing, unlike `permalink`.
 
 ---
 
