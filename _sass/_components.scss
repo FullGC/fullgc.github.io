@@ -26,10 +26,39 @@
    win that fight buried the chart. Type above, chart below: nothing collides,
    and the chart stays fully legible. */
 .hero {
-  padding: var(--sp-7) 0 var(--sp-5);
+  /* Both children share one grid cell: the drawing sets the height, the text
+     overlays it. */
+  display: grid;
+  place-items: center;
+  isolation: isolate;
+  margin-block: var(--sp-5);
 }
 
-.hero-text { text-align: center; }
+.hero-bg,
+.hero-text {
+  grid-area: 1 / 1;
+}
+
+.hero-bg {
+  width: var(--page);
+  justify-self: center;
+  pointer-events: none;
+  /* The stroke reads currentColor, so one file serves both themes and the
+     line always sits in the right relationship to the page. */
+  color: var(--accent);
+  opacity: 0.28;
+
+  svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+}
+
+.hero-text {
+  text-align: center;
+  z-index: 1;
+}
 
 .hero-title {
   font-size: clamp(2.25rem, 1.7rem + 2.2vw, 3.5rem);
@@ -50,7 +79,7 @@
   margin-inline: auto;
   font-size: var(--step-1);
   line-height: 1.4;
-  color: var(--text-dim);
+  color: var(--text);
   letter-spacing: -0.012em;
 }
 
@@ -62,18 +91,6 @@
 
   a { color: var(--text-dim); border-bottom: 1px solid var(--border); }
   a:hover { color: var(--accent); border-bottom-color: var(--accent); }
-}
-
-.hero-chart {
-  display: block;
-  margin: var(--sp-6) auto 0;
-  /* Capped by HEIGHT, with width following — the whole chart, shorter, and
-     downscaled from its native 1024px rather than stretched past it. */
-  height: clamp(150px, 19vw, 230px);
-  width: auto;
-  max-width: 100%;
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
 }
 
 /* ── Home topics row ─────────────────────────────────────────────────────── */
