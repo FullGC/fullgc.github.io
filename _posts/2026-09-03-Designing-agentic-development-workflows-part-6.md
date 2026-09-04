@@ -26,6 +26,8 @@ series, read the list.
 
 ## Where it hurts
 
+![A skeleton sitting on a park bench, having waited so long it died. Caption: "Me, returning to the terminal three hours later." The terminal reads: "Shall I carry on?"]({{ '/public/agentic-workflow-meme-shall-i-carry-on.jpg' | relative_url }}){: .meme}
+
 Honest limitations, all observed in real runs, because a design description without them is marketing.
 
 **Enforcement exists only where the check exists.** Every rule that mattered and was not a script
@@ -34,8 +36,6 @@ the *enumerated* exits; the "keep going" instruction that lost to an agent's ins
 green, two phases from the finish. Politeness is indistinguishable from a crash. The uncomfortable
 lesson: an instruction to a language model is a strong default, never a guarantee, and anything
 load-bearing needs a script behind it.
-
-![A skeleton sitting on a park bench, having waited so long it died. Caption: "Me, returning to the terminal three hours later." The terminal reads: "Shall I carry on?"]({{ '/public/agentic-workflow-meme-shall-i-carry-on.jpg' | relative_url }}){: .meme}
 
 ![Five rules in a row. Three are backed by a script and hold. Two are backed only by prose, and both were skipped on a real run.]({{ '/public/agentic-workflow-enforcement-gap.jpeg' | relative_url }})
 

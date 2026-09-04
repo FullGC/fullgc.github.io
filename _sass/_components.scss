@@ -575,8 +575,8 @@
    float anything. */
 .post-body img.meme {
   float: right;
-  max-height: 357px;
-  max-width: 39%;
+  max-height: 321px;
+  max-width: 35%;
   width: auto;
   margin: var(--sp-1) 0 var(--sp-4) var(--sp-5);
   border-radius: var(--radius);
@@ -591,6 +591,10 @@
     display: block;
   }
 }
+
+/* A full-width figure must never try to squeeze in beside a floated meme.
+   Its own paragraph clears first, so the figure always starts on a fresh line. */
+.post-body p:has(img:not(.meme)) { clear: both; }
 
 /* A float must never run past a heading into the next section. */
 .post-body h2,

@@ -1,6 +1,6 @@
 ---
-title:       "Designing agentic development workflows: what a workflow actually is"
-part_title:  "What a workflow actually is"
+title:       "Designing agentic development workflows: what a workflow is, and what it is made of"
+part_title:  "What a workflow is, and what it is made of"
 subtitle:    "The vocabulary, the cast, and the shape of a single run."
 description: >-
   What an agentic development workflow is: a phased procedure that makes a model's work
@@ -16,7 +16,10 @@ image_w:     1024
 image_h:     559
 ---
 
-Give a team an AI coding tool and you have not given them a way of working. Everyone gets the same agent
+**What the series is for**
+
+Give a team an AI coding tool and you have not given them a way of
+working. Everyone gets the same agent
 and uses it differently: one engineer explores the codebase before planning, another goes straight to
 code, a third writes the tests afterwards if at all. The same engineer does it differently on a
 different day. The phases live in people's heads and get reconstructed from scratch every time, and
@@ -38,35 +41,51 @@ works, how you ship it to other people, and where it still hurts.
 It comes out of workflows we have designed, built and run on real work.
 Nothing here is about a particular product or codebase; the claims are about the pattern.
 
-**How the series is organized.**
+**How the series is organized**
 
 | | Part | Question it answers |
 |---|---|---|
 | **1** | What a workflow is, and what it is made of | what the thing is, and what a single run looks like |
-| **2** | The principles | what keeps the shape honest: the machinery, and the doctrine |
-| **3** | The cost of control | how big an item, how many approvals, which model, and what the whole apparatus buys |
-| **4** | Is it working, and is it worth it | is the output correct · where does the process hurt · did it deliver |
-| **5** | Shipping it, porting it, letting it run | packaging, harness portability, and the road to unattended runs |
-| **6** | Where it hurts, and what to build first | the limitations, and the short list |
+| **2** | [The principles]({{ '/designing-agentic-development-workflows-part-2/' | relative_url }}) | what keeps the shape honest: the machinery, and the doctrine |
+| **3** | [The cost of control]({{ '/designing-agentic-development-workflows-part-3/' | relative_url }}) | how big an item, how many approvals, which model, and what the whole apparatus buys |
+| **4** | [Is it working, and is it worth it]({{ '/designing-agentic-development-workflows-part-4/' | relative_url }}) | is the output correct · where does the process hurt · did it deliver |
+| **5** | [Shipping it, porting it, letting it run]({{ '/designing-agentic-development-workflows-part-5/' | relative_url }}) | packaging, harness portability, and the road to unattended runs |
+| **6** | [Where it hurts, and what to build first]({{ '/designing-agentic-development-workflows-part-6/' | relative_url }}) | the limitations, and the short list |
 
-## What a workflow is
+## What we mean by a workflow
 
-A workflow is a named, phased procedure that takes a unit of work from a request to a reviewable
-result. A language model drives it, but what constrains it is files, scripts and exit codes, not the
-model's good intentions.
+"Workflow" on its own means almost nothing(or, everything..), and "agentic workflow" gets used for two opposite things,
+so it is worth being exact before building anything on the word.
 
-The interesting part is not that a model can write code. It is that a workflow makes the model's work
-inspectable and interruptible at points you pick in advance, and that something other than the model's
-own discipline enforces those points.
+The distinction that earns its keep is
+[Anthropic's](https://www.anthropic.com/engineering/building-effective-agents): a **workflow** is a
+system where models and tools are orchestrated through predefined code paths, while an **agent** is a
+system where the model dynamically directs its own process and tool use. Workflows buy predictability
+on work you can decompose in advance. Agents buy flexibility on work you cannot.
+
+This series is about workflows in that sense, applied to software development. The part worth noticing
+is that they are not the opposite of agents. They contain them.
+
+An agentic development workflow is a named, phased procedure that takes a unit of work from a request
+to a reviewable result, in which three parties each do what they are good at:
+
+- **The procedure owns the path.** Phases and their order are decided before the run, not chosen by a
+  model halfway through it.
+- **Agents own the judgment inside each phase.** What to explore, what the plan should be, whether a
+  review comment is correct.
+- **A human owns specific decisions**, named in advance, that the workflow cannot make for itself.
+
+None of the three is sufficient alone. A path with no judgment in it is a script, and judgment with
+no path is a prompt.
 
 ![Five phases in a row, EXPLORE, PLAN, BUILD, PROVE, PUBLISH, each writing a file, with human gates between PLAN and BUILD and between PROVE and PUBLISH.]({{ '/public/agentic-workflow-phases.jpeg' | relative_url }})
 
 *Figure 1: A fixed order, a file out of every phase, and a person required at exactly two points.*
 
-Concretely, a workflow is a skill that orchestrates other skills. You may think of it as a *recipe plus chef*: the recipe supplies the structure (phases, order, what must be true before the
-next step) and the chef supplies the judgment. Neither one alone gets you consistent quality. A recipe
-without a cook is a document nobody follows, and a cook without a recipe produces something different
-every service.
+The interesting claim is not that a model can write code. It is that a procedure makes a model's work
+inspectable and interruptible at points you pick in advance, and that something other than the model's
+own discipline enforces those points. How you build such a procedure is a separate question with
+several answers, and the one used throughout this series is described below.
 
 That combination is what makes the following six properties reliable rather than aspirational. You
 can ask a bare prompt for most of them, and you will often get them:
