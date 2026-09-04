@@ -3,7 +3,7 @@ title:            fullgc
 tagline:          "Practical guides for the backend guild"
 description:      >-
   Practical, in-depth engineering write-ups on Scala, the JVM, Akka, Kubernetes,
-  Consul and HashiCorp Vault — by Dani Shemesh, backend and infrastructure engineer.
+  Consul and HashiCorp Vault — by Dani Shemesh.
 url:              "https://fullgc.github.io"
 baseurl:          ""
 lang:             en_US
