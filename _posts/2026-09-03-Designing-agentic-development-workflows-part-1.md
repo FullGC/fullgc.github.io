@@ -1,6 +1,7 @@
 ---
-title:       "Designing agentic development workflows — Part 1"
+title:       "Designing agentic development workflows: what a workflow actually is"
 part_title:  "What a workflow actually is"
+subtitle:    "The vocabulary, the cast, and the shape of a single run."
 description: >-
   What an agentic development workflow is: a phased procedure that makes a model's work
   inspectable and interruptible, and the parts it is built from.
@@ -26,14 +27,14 @@ The attention goes wrong in both directions, too. People sit and watch a model r
 they were never going to argue with, then look away at the one point where their judgment was the only
 thing that mattered, and find out afterwards that it took a route nobody would have approved.
 
-![Anakin and Padme meme. Anakin: "We gave every engineer the best AI coding agent." Padme, smiling: "So we're 10x now, at higher quality, without going bankrupt, right?" Anakin stares back in silence. Padme, no longer smiling: "...right?"]({{ '/public/agentic-workflow-meme-10x.jpg' | relative_url }}){: .float-right}
+![Anakin and Padme meme. Anakin: "We gave every engineer the best AI coding agent." Padme, smiling: "So we're 10x now, at higher quality, without going bankrupt, right?" Anakin stares back in silence. Padme, no longer smiling: "...right?"]({{ '/public/agentic-workflow-meme-10x.jpg' | relative_url }}){: .meme}
 Getting a model to write code is the easy part. The part that needs designing is getting it to do the
 same thing twice, to stop where you want it to stop, and to leave behind something you can actually
 review. 
 
 This series is about how to design that: a family of agentic development workflows, what they
 are made of, why the pieces are shaped the way they are, what the shape buys, how you know any of it
-works, and where it still hurts.
+works, how you ship it to other people, and where it still hurts.
 It comes out of workflows we have designed, built and run on real work.
 Nothing here is about a particular product or codebase; the claims are about the pattern.
 
@@ -42,12 +43,13 @@ Nothing here is about a particular product or codebase; the claims are about the
 | | Part | Question it answers |
 |---|---|---|
 | **1** | What a workflow is, and what it is made of | what the thing is, and what a single run looks like |
-| **2** | The principles | what keeps the shape honest: eight of machinery, eleven of judgment |
-| **3** | The economics of a workflow | how big an item, how many approvals, which model, and what the whole apparatus buys |
-| **4** | Knowing it works | is the output correct · where does the process hurt · did it deliver |
-| **5** | Shipping it, and growing it up | packaging, portability, autonomy, and where it fails |
+| **2** | The principles | what keeps the shape honest: the machinery, and the doctrine |
+| **3** | The cost of control | how big an item, how many approvals, which model, and what the whole apparatus buys |
+| **4** | Is it working, and is it worth it | is the output correct · where does the process hurt · did it deliver |
+| **5** | Shipping it, porting it, letting it run | packaging, harness portability, and the road to unattended runs |
+| **6** | Where it hurts, and what to build first | the limitations, and the short list |
 
-## 1. What a workflow is
+## What a workflow is
 
 A workflow is a named, phased procedure that takes a unit of work from a request to a reviewable
 result. A language model drives it, but what constrains it is files, scripts and exit codes, not the
@@ -158,7 +160,7 @@ Four reasons to be deliberate about it:
 - **Nothing needs to be built first.** No queue, no runner, no service account. A workflow is useful on
   the day it is written.
 - **It is how you earn the right to run unattended.** You learn where a workflow breaks while somebody
-  is watching. Every limitation in part five was found with a human sitting in front of a run.
+  is watching. Every limitation in part six was found with a human sitting in front of a run.
 
 ### The end game is autonomy, for some of them
 
@@ -172,7 +174,7 @@ be true before you let a run proceed with nobody watching.
 
 ---
 
-## 2. A family of workflows, one skeleton
+## A family of workflows, one skeleton
 
 Build workflows as a family rather than one at a time, because most of what they do is the same and
 the differences are informative. They share a skeleton for the reason given earlier (the development
@@ -189,14 +191,14 @@ process underneath them is shared) and they diverge exactly where the real proce
 
 Read the differences as design information:
 
-- The bug workflow adds **classify** at the front (a surprising number of "bugs" are not bugs, and the
-  cheapest possible outcome is a triaged ticket and no code) and **prove** at the back.
-- The refactor workflow **inverts the test relationship**: instead of writing failing tests that define
+- The bug workflow adds classify at the front (a surprising number of "bugs" are not bugs, and the
+  cheapest possible outcome is a triaged ticket and no code) and prove at the back.
+- The refactor workflow inverts the test relationship: instead of writing failing tests that define
   new behavior, it treats the existing suite as the specification and any change in it as a defect.
-- The review workflow has **no loop and no gate on code**, because it changes nothing: its output is a
+- The review workflow has no loop and no gate on code, because it changes nothing: its output is a
   judgment, and its risk is publishing a wrong one, so its distinctive phase is *verification of its
   own findings*.
-- The docs workflow has **no tests**, so its quality gate is a coverage measure instead.
+- The docs workflow has no tests, so its quality gate is a coverage measure instead.
 
 Underneath, all six share the skeleton below, and more importantly they share their *parts*.
 
@@ -213,9 +215,9 @@ distinctive to it:
 | **Self check** | — | ● | ● | ● | — | ● |
 | **Report** | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 
-Two rows carry most of the information. **Classify** is present only where a request might turn out not
+Two rows carry most of the information. Classify is present only where a request might turn out not
 to need code at all (a bug that is not a bug, a review comment that is wrong) and in both of those the
-cheapest good outcome is no diff. **Self check** is where each workflow proves its own work, and the
+cheapest good outcome is no diff. Self check is where each workflow proves its own work, and the
 oracle differs every time: for a bug it is reverting the fix and watching the new test fail; for a
 refactor it is the *existing* suite passing unchanged; for a review it is verifying its own findings
 before publishing them; for docs it is a coverage ledger. Same slot, four different definitions of "did
@@ -224,7 +226,7 @@ named in the plan.
 
 ---
 
-## 3. The cast
+## The cast
 
 Five kinds of component, and the distinctions earn their keep:
 
@@ -264,13 +266,13 @@ notices: a skill firing on work it was never meant for.
 A step can run two ways, and the difference matters more than any other implementation detail:
 
 - **Invoked inline**: same context, same model. The orchestrator simply follows the skill's procedure.
-- **Dispatched**: a sub-agent with **fresh context** and its own model, effort and tool allowlist.
+- **Dispatched**: a sub-agent with fresh context and its own model, effort and tool allowlist.
 
 The same skill serves both paths, unchanged. That is what makes a skill reusable rather than a phase.
 
 For dispatched work there is an extra link in the chain: the orchestrator does not call the skill, it
-calls an **agent by name**; the agent definition supplies the configuration, and the sub-agent it spawns
-then invokes the skill. The indirection earns its place because the two files know different things: **the agent is workflow-aware, the skill is not.** The skill stays ignorant of which workflow is using it,
+calls an agent by name; the agent definition supplies the configuration, and the sub-agent it spawns
+then invokes the skill. The indirection earns its place because the two files know different things: **the agent, in our case, is workflow-aware, the skill is not.** The skill stays ignorant of which workflow is using it,
 while the agent carries what only this workflow knows: which tier this decision deserves, and which tools
 it may touch.
 
@@ -280,24 +282,27 @@ it may touch.
 
 ---
 
-## 4. Skills are reusable, composable, and usable alone
+## Skills have to be reusable
 
 This is what makes a family cheaper than the sum of its members, and it rests on one rule:
 
 > **A skill that only works inside one workflow is not a skill. It is a phase.**
 
-Every skill must be usable three ways.
+So every skill has to be usable at least two ways. One is inside its own workflow, which is a
+given. The other is some form of reuse beyond it, and that comes in two shapes. Either one is
+enough; what is not optional is that one of them holds.
 
-**Inside a workflow.** The ordinary case: an orchestrator invokes it as a phase.
+**Inside a workflow.** The ordinary case: an orchestrator invokes it as a phase. This one
+comes free.
 
-**Inside *several* workflows.** Planning, implementing, validating, writing failing tests, taking human
+**Either: inside *several* workflows.** Planning, implementing, validating, writing failing tests, taking human
 approval, isolating a branch, filing a ticket. These are shared by nearly every workflow in the family.
 The reuse is not only economy. Improving one of them improves every workflow at once, and a defect in
 one is felt everywhere. That asymmetry is worth measuring deliberately: *which* shared component hurts,
 and in how many workflows, because a fault in a component used by five workflows deserves five times
 the attention of a fault in a leaf.
 
-**Standalone, by a human, with no workflow at all.** "Explore how this subsystem works." "Plan this
+**Or: standalone, by a human, with no workflow at all.** "Explore how this subsystem works." "Plan this
 change." "Review this diff." "Set up an isolated branch for me." Standalone usability is a design constraint rather than a bonus feature, because it forces a
 skill to take its inputs explicitly, resolve its own context, and write its output to a file instead of
 leaning on an orchestrator's conversation. A skill
@@ -318,7 +323,7 @@ get wrong.
 
 ---
 
-## 5. Anatomy of a run
+## Anatomy of a run
 
 Whatever the domain, the skeleton repeats. Individual workflows skip phases (review has no build loop, docs has no tests, refactor writes none) but the order never changes:
 
@@ -345,19 +350,19 @@ CLOSE        a report, on every exit path
 *Figure 3: The skeleton. The amber bars are the only places a person is required.*
 
 **Where the spine comes from.** The plan → implement → validate loop in the middle of that skeleton is
-not original here. It is Cole Medin's **PIV loop** (plan, implement, validate) which he states as the
+not original here. It is Cole Medin's PIV loop (plan, implement, validate) which he states as the
 phased core of his AI-coding methodology
 ([ai-transformation-workshop](https://github.com/coleam00/ai-transformation-workshop)), downstream of the
 context-engineering / PRP work that precedes it
 ([context-engineering-intro](https://github.com/coleam00/context-engineering-intro)). Four of his moves
-carry straight into the design above: **prime the context before planning** rather than planning cold; a
-plan that **states its own validation strategy**; **a fresh context window for implementation**; and
+carry straight into the design above: prime the context before planning rather than planning cold; a
+plan that states its own validation strategy; a fresh context window for implementation; and
 **validation as layers**: type-check and lint, then unit, then integration, then review, rather than one
 test command. His `CLAUDE.md`-style rules file is the same instinct as the "name intents, not commands" rule in part two: the repository declares its
 own rules, the procedure stays generic.
 
-What this document adds is mostly about making that loop hold **when the steps are delegated and nobody is
-watching every one of them**: gates recorded by content hash, a script rather than the agent inside
+What this document adds is mostly about making that loop hold when the steps are delegated and nobody is
+watching every one of them: gates recorded by content hash, a script rather than the agent inside
 the loop deciding when it stops, files as the only interface between phases, and a
 prove step after green that tries to make the new tests fail. The loop is his; the refereeing,
 the artifacts and the paranoia are the parts that get learned the hard way.

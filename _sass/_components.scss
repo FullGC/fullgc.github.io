@@ -566,3 +566,32 @@
     margin: var(--sp-5) 0;
   }
 }
+
+/* ── In-body meme ─────────────────────────────────────────────────────────
+   Floated so text wraps beside it. These arrive in very different aspect
+   ratios (720x350 through 500x880), so cap the HEIGHT rather than the width:
+   a tall meme then cannot run further down the page than the prose beside it,
+   and a wide one still gets a usable width. Below 40rem there is no room to
+   float anything. */
+.post-body img.meme {
+  float: right;
+  max-height: 357px;
+  max-width: 39%;
+  width: auto;
+  margin: var(--sp-1) 0 var(--sp-4) var(--sp-5);
+  border-radius: var(--radius);
+}
+
+@media (max-width: 40rem) {
+  .post-body img.meme {
+    float: none;
+    max-height: none;
+    max-width: 100%;
+    margin: var(--sp-5) auto;
+    display: block;
+  }
+}
+
+/* A float must never run past a heading into the next section. */
+.post-body h2,
+.post-body h3 { clear: both; }
