@@ -54,8 +54,8 @@ Nothing here is about a particular product or codebase; the claims are about the
 
 ## What we mean by a workflow
 
-"Workflow" on its own means almost nothing(or, everything..), and "agentic workflow" gets used for two opposite things,
-so it is worth being exact before building anything on the word.
+In software development, "workflow" is a heavily overloaded term. Throw "agentic" in front of it and get two opposite things,
+so it's worth defining exactly what we mean before building anything around the concept.
 
 The distinction that earns its keep is
 [Anthropic's](https://www.anthropic.com/engineering/building-effective-agents): a **workflow** is a

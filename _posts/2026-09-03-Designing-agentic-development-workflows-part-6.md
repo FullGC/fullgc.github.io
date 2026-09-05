@@ -71,6 +71,32 @@ faster regardless of the tooling. What survives: whether specific, named frictio
 expensive operations: environment boots, dependency re-locks, full-suite runs, loop iterations, human
 waits. Counts cannot be faked by a warm cache.
 
+### What no amount of care will fix
+
+Everything above is a defect. Write the missing check, delete the duplicate copy, add the contract
+test at the seam, and the limitation goes away. The shape of the design does not have to change.
+
+There is a second category that does not work that way, because it follows from running the
+procedure *inside* the agent session rather than around it:
+
+- The orchestrator cannot choose its own model, its effort or its provider, because a skill's
+  metadata does not change what serves it.
+- It cannot manage its own context, so its judgment about its own procedure degrades over a long
+  run, and the only remedy is to stop and ask a human to type `/compact`.
+- It cannot do two things at once, so a fan-out of parallel reviewers is sequential underneath.
+- It cannot be started by anything but a person at a terminal, which is the last prerequisite in
+  [part five](/designing-agentic-development-workflows-part-5/) and the one that caps how
+  autonomous a workflow of this shape can become.
+- It cannot make a step deterministic, only the command inside it. A phase needing no intelligence
+  at all still reaches its script through a model deciding to call it, so what you get is a
+  repeatable command behind an unrepeatable decision: a round trip in cost, and some chance of the
+  step not happening at all.
+- It cannot avoid having a lifecycle, so pending and paused and resumed and cancelled become yours
+  to implement: incrementally, in the margins of doing something else.
+
+No amount of better skill-writing reaches any of that. Whether it is worth reaching for something
+that does is a separate question, and a longer one.
+
 ---
 
 ## If you are building one

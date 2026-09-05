@@ -377,9 +377,15 @@ a run that had a human watching:
    inspected one at a time.
 9. **An eval suite you actually trust** (part four), including a clean control. Unattended operation without
    one is not automation: it is unmonitored production.
+10. **Something other than a person to start it.** A ticket transition can only be a trigger if some
+   process is listening for it and can begin a run, and that process has to outlive any terminal
+   session. This is the one prerequisite on the list that better skills cannot supply.
 
 **The honest reading:** most of the work between "useful locally" and "trustworthy unattended" is not
 model capability. It is enforcement, isolation, classification and reporting: the boring parts, again.
+The exception is the last item, and it is a real one. Everything above it can be built inside the
+skills; a runner cannot, because a procedure that lives inside an interactive session has nothing to
+start it. Part six returns to that.
 
 ---
 
