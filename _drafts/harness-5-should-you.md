@@ -161,34 +161,13 @@ reachable from a neutral caller. If one vendor's strongest tier works best throu
 and another's does too, a neutral engine is not getting the best of both, it is getting whatever
 each is willing to expose to outsiders.
 
-Note where that line falls, though: interactive against programmatic, rather than skills against
-engines. A developer running an orchestrator skill by hand is interactive use of one vendor's own
-harness, which is precisely the usage every vendor is trying to keep cheap. An engine is on the
-other side permanently, by construction. Fewer capabilities, less exposure, and no way to have
-both.
+The line falls between interactive and programmatic, not between skills and engines. A developer
+running an orchestrator skill by hand is interactive use of one vendor's own harness, which is
+precisely the usage every vendor is trying to keep cheap. An engine is on the other side
+permanently, by construction. Fewer capabilities, less exposure, and no way to have both.
 
 If a change in one vendor's terms would strand a process your whole team depends on, nothing inside
 the tool helps.
-
-## What we chose
-
-The orchestrator skill, with part one's limits accepted rather than solved.
-
-Two facts decided it, and neither is about engines. Most of our work needed judgment at every step,
-so model-free steps would not have bought much. And nobody except the person who started a run ever
-needed to reach it. Neither gain paid for itself, which left the vendor exposure with nothing to
-weigh against.
-
-Three things would change that:
-
-- **A release that closes the gap.** Dynamic workflows arrived while this was being written and
-  took several of part one's limits off the table without leaving Claude Code. They did not take
-  the step with no model in it. If a later release does, most of the case for crossing goes away.
-- **More people needing to reach a run.** Team growth, an on-call rotation, a queue of mechanical
-  tickets, or one quarter of wanting a pull request waiting on Monday morning. This is the one most
-  likely to move, and it is the one that would push us across.
-- **Vendors settling the terms.** A public commitment to treating headless use like interactive use
-  removes the veto. A reintroduced split makes it permanent.
 
 ## The answer
 
