@@ -7,11 +7,17 @@ part:       2
 tags:       [ai, agents, workflows, automation, claude-code]
 ---
 
-Part one asserted a good deal about "an engine". That provider resolves per node. That sessions get
-forked rather than mutated. That independent nodes fire at the same time. That a run is a row in a
-database with a lock on it.
+Part one described a procedure that lives inside the agent session, and the limits that follow from
+it living there. This part is about the alternative, and about how little of what is sold as the
+alternative actually is one.
 
-Every one of those was a claim the reader had to take on trust. This part pays that debt.
+A **workflow engine** is a program that holds the procedure and calls the coding agent when it
+needs intelligence. That is the whole definition. Everything separating an engine from a skill
+follows from it, including the two things it will cost you.
+
+Part one also made promises about engines that it never justified: provider resolved per node,
+sessions forked rather than mutated, a run that outlives the process which started it. Those get
+cashed here.
 
 *Assumes part one's list of limits, and the vocabulary of the previous series: orchestrator, skill,
 sub-agent, gate, run state.*
@@ -34,11 +40,11 @@ The agent is no longer the thing running the workflow. It is a subroutine the wo
 | Where results accumulate | the conversation | run state on disk |
 | Model and provider | whatever the session is running | resolved per node |
 | Steps with no model in them | none | `bash` and `script` nodes |
-| A run ends when | the terminal closes | it reaches a terminal state |
+| A run ends when | the process that started it exits | it reaches a terminal state |
 
 Everything below is a consequence of that table rather than a separate thing somebody built. Once
 the procedure lives outside the session, the session becomes a parameter: pick which one, run six
-at once, restart one that died, start one when nobody is at a keyboard.
+at once, restart one that died, hand a paused one to somebody else.
 
 Two tools carry most of the examples below.
 [**Archon**](https://github.com/coleam00/Archon) is an open-source harness builder: YAML workflow
@@ -64,7 +70,7 @@ A workflow definition describes nodes and the edges between them:
 The engine parses that, validates it against a schema, and topologically sorts it to prove there
 are no cycles. A workflow referring to a node that does not exist fails at load time rather than
 halfway through a run. The machinery is unremarkable, a schema validator and a standard topological
-sort, and part three walks through one implementation.
+sort, and part four walks through one implementation.
 
 The equivalent in an orchestrator skill is a numbered list in Markdown. Nothing to validate,
 because there is no schema, because it is prose. A phase referring to an artifact no earlier phase
@@ -141,23 +147,26 @@ exists but what putting it somewhere authoritative allows:
 None of this is exotic. It is the ordinary content of a workflow engine, and none of it is
 reachable from a Markdown file.
 
-### Detached, and startable by something other than a person
+### A run anything can address
 
-Two more capabilities fall out of the run having its own process, and these change what a workflow
-is *for*.
+It is worth being careful here, because the obvious version of this claim is wrong. A skill can be
+started without a person: non-interactive mode expands a skill invocation in the prompt string,
+there is a flag for suppressing permission prompts when nobody is there to answer, and driving the
+whole thing from a CI job is documented. Triggering is not the discriminator.
 
-**It can run detached.** Starting one hands back an identifier you can poll, or an event stream you
-can subscribe to, and the run proceeds whether or not anyone is watching.
+What an engine adds is that the thing started has an identity outside the process running it.
+Starting a run hands back an id and an event stream, and from there:
 
-**It can be triggered.** Once a run begins with an API call, a Jira label moving to "ready for AI"
-can begin one, so can a pull request opening, so can a cron schedule. That is the tenth
-prerequisite from [part five of the previous series](/designing-agentic-development-workflows-part-5/),
-the one item on that list better skills cannot supply.
+- a colleague can approve a gate from Slack, on a run executing on somebody else's laptop;
+- a dashboard can list what is in flight without asking the processes;
+- a second run can discover that the working directory is taken;
+- a failed run can be resumed by whichever process picks it up.
 
-The platform surface follows the same logic. Once a run id and an event stream exist, a Slack
-adapter, a web dashboard and a GitHub integration are all clients of the same state. That is a real
-gain in run-level observability: progress, status and cost per node, history across runs. Whether
-it is the kind of observability engineers actually missed is a different question.
+The platform surface follows from the same fact. Once a run id and an event stream exist, a Slack
+adapter, a web dashboard and a GitHub integration are all clients of the same state rather than
+separate integrations. That is a real gain in run-level observability: progress, status and cost
+per node, history across runs. Whether it is the kind of observability engineers actually missed is
+a different question.
 
 ### Provider, model and context, per node
 
@@ -181,7 +190,7 @@ An engine settles all three per node:
 
 The provider argument is also the standard reason an engine is said to survive a vendor changing
 its terms. It is a real argument about *models*, and there is a kind of vendor change it does not
-protect against at all, which part four returns to.
+protect against at all, which the last part returns to.
 
 ## Where the boundary is
 
@@ -197,10 +206,66 @@ outside the model**, and can it **run a step in your checkout without a model in
 | Graph frameworks: LangGraph | yes | only if you build it |
 | Agent-loop builders: CrewAI, AutoGen, LangFlow, Flowise, Dify | varies | only if you build it |
 | General automation: n8n | yes | no |
+| A script or CI pipeline you wrote | yes | **yes**, up to a point |
 
-Only the top row does both, and the rest of this section is about why the near misses miss.
+The top row does both by design. The bottom row deserves a pause, because it also does both and is
+not an engine: a `Makefile` or a CI job calling the coding agent per step has real control flow,
+real model-free steps, and a run with an id and logs anybody can read. What it lacks is anything
+that understands coding agents, which is the distinction the last part turns on.
 
-### The harness grew one of its own
+The rest of this section is about the rows in between, and why the near misses miss.
+
+### What the inversion costs
+
+Everything above is the case for. An article that stops there is a brochure, and the two costs
+below are not teething problems: one is the same property the whole argument rests on, seen from
+the other side, and the other is not about the engineering at all.
+
+### Enforceability and steerability are one thing
+
+The control flow is data, fixed at definition time, not negotiable by a model. That is the reason
+to trust it. It is also the reason it is unpleasant to work with.
+
+When the harness is the caller, a developer cannot lean over and say skip this gate, I know exactly
+what this diff is, or ask me before you push from now on, or try it the other way. The thing that
+was a sentence in a chat becomes a pull request against a YAML file.
+
+Which of those two readings you find obvious depends on where you sit:
+
+| | What they see | What they conclude |
+|---|---|---|
+| Whoever owns the process | a procedure that cannot be talked out of halfway through | the fixed control flow *is* the product |
+| The developer at the keyboard | a procedure that cannot be talked to at all | a straitjacket where a sentence used to do |
+
+Neither is wrong, and no amount of tooling resolves it, because it is one property with two signs.
+It also runs backwards: the orchestrator skill a developer finds pleasantly steerable is the one a
+platform owner cannot rely on.
+
+### The interop has to stay open
+
+An engine is, by construction, headless third-party non-interactive use of somebody else's coding
+agent. That is the usage pattern a model vendor has the clearest incentive to treat differently,
+and it is the first one anybody would restrict.
+
+This is not hypothetical. In May 2026 Anthropic announced a split of the flat-rate subscription
+into two pools: an interactive pool, where human-in-the-loop use through the apps and terminal
+sessions stayed under the standard subscription, and a separate credit pool for automated headless
+usage. It was withdrawn. The point is not that it happened, it is that somebody drew the line in
+exactly the place that separates a person typing from an engine calling.
+
+The usual reassurance is that the provider is a line of configuration, so you can move. That is
+sound about **models** and close to worthless about **access terms**, because every vendor shipping
+a coding agent faces the same incentive. Switching does not escape a policy they all converge on.
+
+It can also invert the main selling point. Best model per node assumes every vendor's best is
+reachable from a neutral caller. If one vendor's strongest tier works best through its own harness
+and another's does too, a neutral engine is not getting the best of both, it is getting whatever
+each is willing to expose to outsiders.
+
+None of that is an argument against engines. It is the thing you are accepting when you adopt one,
+and it belongs on the same page as the benefits.
+
+## The harness grew one of its own
 
 Claude Code's [dynamic workflows](https://code.claude.com/docs/en/workflows) are the same inversion
 turning up from the inside: a JavaScript script a runtime executes, where the documentation's own
@@ -279,9 +344,11 @@ An engine is a real dependency:
 - YAML to maintain
 - a layer between you and the agent you were talking to five minutes ago
 
-Nothing above argues you should adopt one. It argues that the category is coherent, that its capabilities follow from a single
-inversion rather than a pile of features, and that most of what is marketed alongside it is not in
-it.
+Nothing above argues you should adopt one. It argues that the category is coherent, that its
+capabilities follow from a single inversion rather than a pile of features, that it carries two
+costs worth naming out loud, and that most of what is marketed alongside it is not in it.
 
-Part three is about Archon specifically: how one real implementation validates a graph, resolves a
-provider, forks a session, classifies an error and recovers a failed run.
+Part three is about Archon specifically: what it is, how you start a run, and what its five claims
+for itself actually rest on. Part four goes underneath, into how one real implementation validates
+a graph, resolves a provider, forks a session, classifies an error and recovers a failed run. Part
+five is the question this series is named for, and it is not a question about Archon.
