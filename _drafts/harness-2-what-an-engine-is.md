@@ -247,11 +247,14 @@ An engine is, by construction, headless third-party non-interactive use of someb
 agent. That is the usage pattern a model vendor has the clearest incentive to treat differently,
 and it is the first one anybody would restrict.
 
-This is not hypothetical. In May 2026 Anthropic announced a split of the flat-rate subscription
-into two pools: an interactive pool, where human-in-the-loop use through the apps and terminal
-sessions stayed under the standard subscription, and a separate credit pool for automated headless
-usage. It was withdrawn. The point is not that it happened, it is that somebody drew the line in
-exactly the place that separates a person typing from an engine calling.
+This is not hypothetical. In May 2026 Anthropic announced that programmatic use of Claude, the
+Agent SDK, `claude -p`, GitHub Actions and third-party apps, would leave the flat-rate subscription
+for a separate metered credit, while use through its own chat apps and CLI stayed where it was. The
+change was
+[paused](https://support.claude.com/en/articles/15036540-use-the-claude-agent-sdk-with-your-claude-plan)
+on the day it was due to take effect, and paused is the word Anthropic used: a revised plan is
+still promised. The point is not what happened to it. The point is where the line was drawn, which
+is exactly where a person typing stops and a program calling starts.
 
 The usual reassurance is that the provider is a line of configuration, so you can move. That is
 sound about **models** and close to worthless about **access terms**, because every vendor shipping

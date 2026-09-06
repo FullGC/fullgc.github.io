@@ -65,14 +65,16 @@ the only thing pushing you across, that `Makefile` is the entire answer.
 
 ### A run somebody else can reach
 
-I had this one wrong for most of the time I spent writing the series, and the wrong version is the
-one you will hear most often: a skill needs a person to start it, so autonomy needs an engine.
+Autonomy looks like the argument here. A skill needs a person to start it, so anything unattended
+needs an engine. It does not hold. `claude -p` expands a skill invocation in the prompt string,
+there is a documented flag for suppressing permission prompts when nobody is there to answer them,
+and running the whole thing from CI has its own page in the manual. The gates are easier still:
+tell the agent not to stop at them and it will not, with the usual caveat that an instruction to a
+model is a strong default rather than a guarantee. A cron entry can drive the procedure end to
+end.
 
-It is false. `claude -p` expands a skill invocation in the prompt string, there is a documented flag
-for suppressing permission prompts when nobody is there to answer them, and running the whole thing
-from CI has its own page in the manual. Getting past the gates is cheaper still. Write the workflow
-without them, or just tell the agent not to stop, and accept that the instruction is a strong
-default rather than a guarantee. Either way a cron entry drives the procedure end to end.
+It does put you on the wrong side of the split described later on, which is worth knowing before
+you build on it. But that is a billing problem, not a missing capability.
 
 What is missing is not the trigger. It is that the thing you started is a *session*, and a session
 is addressable by whoever holds its id on the machine that has it. A run is addressable by anyone.
@@ -85,8 +87,7 @@ That sounds like a distinction without a difference until you list what it buys:
 - a failed run picked up days later by a process that did not start it.
 
 **So: does anyone except the person who started a run need to see it, stop it, or answer it?** If
-no, cross the line with a shell script and stop thinking about it. If yes, you need runs kept
-somewhere durable, and the second question starts.
+yes, you need runs kept somewhere durable, and the second question starts.
 
 ## Adopt, or write one by accident
 
@@ -135,13 +136,21 @@ An engine is, by construction, headless third-party non-interactive use of someb
 agent. That is the usage pattern a model vendor has the clearest incentive to price or gate
 differently, and the first one anybody would restrict.
 
-In May 2026 Anthropic announced a split of the flat-rate subscription into two pools: an
-interactive pool where human-in-the-loop use through the apps and terminal sessions stayed under
-the standard subscription, and a separate credit pool for automated headless usage. It was
-withdrawn. The point is not that it happened. The point is that somebody sat down and drew the line
-in exactly the place that separates a person typing from an engine calling, which means the line
-can be drawn again, by anyone, and it need not be about price. A model tier, a beta, a rate limit
-would all do.
+On 14 May 2026 Anthropic announced exactly that, to take effect a month later. Use of Claude
+through its own first-party surfaces, the chat apps and the Claude Code CLI you type into, would
+stay on the flat-rate subscription. Programmatic use would not: the Agent SDK, `claude -p`, GitHub
+Actions and third-party apps were to move to a separate monthly credit billed at standard API
+rates, worth twenty dollars on Pro and two hundred on the largest Max plan, with no rollover.
+
+On 15 June, the day it was due to start, Anthropic
+[paused it](https://support.claude.com/en/articles/15036540-use-the-claude-agent-sdk-with-your-claude-plan):
+"For now, nothing has changed." Note the wording. Not cancelled, paused, with a revised plan
+promised and advance notice offered before anything takes effect. That is still where it stands.
+
+The point was never that the change landed. It is that somebody sat down and drew the line in
+exactly the place that separates a person typing from a program calling, and then said they intend
+to draw it again somewhere. It need not be about price next time either. A model tier, a beta, or a
+rate limit would do.
 
 The usual reassurance is that the provider is a line of configuration, so you can move. That is
 sound about **models** and close to worthless about **access terms**, because every vendor shipping
@@ -152,10 +161,11 @@ reachable from a neutral caller. If one vendor's strongest tier works best throu
 and another's does too, a neutral engine is not getting the best of both, it is getting whatever
 each is willing to expose to outsiders.
 
-There is an irony in this worth sitting with. The orchestrator skill, the weaker pattern, the one
-this whole series has been listing the limits of, is interactive human-in-the-loop use of one
-vendor's own harness, which is precisely the usage every vendor is trying to keep cheap. Fewer
-capabilities, less exposure.
+Note where that line falls, though: interactive against programmatic, rather than skills against
+engines. A developer running an orchestrator skill by hand is interactive use of one vendor's own
+harness, which is precisely the usage every vendor is trying to keep cheap. An engine is on the
+other side permanently, by construction. Fewer capabilities, less exposure, and no way to have
+both.
 
 If a change in one vendor's terms would strand a process your whole team depends on, nothing inside
 the tool helps.
@@ -187,13 +197,14 @@ Yep, as you've probably guessed, it depends.
 The line is real. A procedure that runs the agent is enforced in a way a procedure the agent runs
 can never be, and no amount of careful writing closes that gap.
 
-It is also narrower than it sounds. We've already mentioned what the engine fixes. The price is a process to run, a schema to maintain, a layer between you and the agent you were talking to five
+It is also narrower than it sounds. We've already mentioned what the engine fixes. The price is a
+process to run, a schema to maintain, a layer between you and the agent you were talking to five
 minutes ago, and a bet that vendors keep letting other people's harnesses call their models.
 
 The teams who should cross are the ones already paying for staying put. A procedure that is mostly
-mechanical steps is cheaper as a program. Still want to harness? a `Makefile` will do. A team already maintaining a
-state file, a lock and a retry policy has written most of an engine and should stop pretending
-otherwise.
+mechanical steps is cheaper as a program. Still want to harness? A `Makefile` will do. A team
+already maintaining a state file, a lock and a retry policy has written most of an engine and
+should stop pretending otherwise.
 
 Everyone else is fine where they are, for now. An orchestrator skill is a procedure a model has
 agreed to follow. That is worth a great deal, and it is not the same as a procedure that runs.
