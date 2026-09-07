@@ -1,9 +1,19 @@
 ---
-title:    "Should you harness the harness: what the orchestrator skill cannot do"
-subtitle: "The limits that are not defects, and do not go away however well you write."
-series:   "Should You Harness the Harness"
-part:     1
-tags:     [ai, agents, workflows, automation, claude-code]
+title:      "Should you harness the harness: what the orchestrator skill cannot do"
+part_title: "What the orchestrator skill cannot do"
+subtitle:   "The limits that are not defects, and do not go away however well you write."
+description: >-
+  Six limits an orchestrator skill cannot write its way out of, because they follow from
+  where the procedure runs rather than from how well it was written.
+permalink:  /should-you-harness-the-harness-part-1/
+date:       2026-09-07 09:00:00
+series:     "Should You Harness the Harness"
+part:       1
+tags:       [ai, agents, workflows, automation, claude-code, harness]
+image:      /public/harness-order-is-prose.png
+banner:     false
+image_w:    1024
+image_h:    572
 ---
 
 A development workflow can be written as a set of skills the coding agent reads and follows: phases
@@ -21,7 +31,7 @@ program that *calls* the coding agent, rather than a document the coding agent r
 Whether that trade is worth making is the question these five parts work through. This one
 establishes why it is a question at all.
 
-## Two kinds of limitation
+## A defect, or a limit
 
 [Part six of the previous series](/designing-agentic-development-workflows-part-6/) already lists
 the things that hurt, and every one of them is a mistake: a gate described in prose instead of
@@ -36,8 +46,8 @@ The test for whether something belongs here is a single question: **could a suff
 disciplined author fix it by writing better skills?** If yes, it is a defect and belongs in part
 six's list. If no, it belongs here.
 
-That line is a judgment call, and someone else would draw it differently. The last section shows
-the cases I had to argue myself out of, including one I initially got wrong.
+That line is a judgment call, and someone else would draw it differently. A later section shows
+the cases I had to argue myself out of.
 
 ## What better skills cannot reach
 
@@ -45,40 +55,44 @@ the cases I had to argue myself out of, including one I initially got wrong.
 |---|---|
 | Model, effort, provider | only a dispatched sub-agent can declare a tier; the orchestrator runs on whatever the session runs |
 | Its own context window | the thing that would prune the conversation *is* the conversation |
-| Two things at once | one conversation, one turn in flight |
+| Two phases at once | sub-agents fan out inside a turn, but the conversation itself is serial |
 | Steps that need no intelligence | every step is a tool call some model chose to make |
 | The order itself | phase order is prose, followed because the model is inclined to follow it |
 | A run another process can address | a session id is not a run: nothing else can find it, watch it, pause it or resume it |
 
+The first five get a section each below. The sixth gets one of its own further down, because it is
+the one that decides the question.
+
 ### Model, effort, and provider
 
-The first principle in [part two](/designing-agentic-development-workflows-part-2/) states this as a
-fact of the runtime rather than a design choice: model and reasoning effort can only be set when a
-step is dispatched as a sub-agent. A skill's own metadata does not change what serves it.
+The first principle in [part two of the previous series](/designing-agentic-development-workflows-part-2/)
+states this as a fact of the runtime rather than a design choice: model and reasoning effort can only be set
+when a step is dispatched as a sub-agent. A skill's own metadata does not change what serves it.
 
-That is why the orchestrator is thin. Not because thin is elegant, but because it runs on whatever
-model the developer's session happens to be using, and the only way to say "this decision deserves
-the strongest model" is to push the decision out into a dispatched agent that can declare a tier.
+That is why the orchestrator is thin. It runs on whatever model the developer's session happens to
+be using, and the only way to say "this decision deserves the strongest model" is to push the
+decision out into a dispatched agent that can declare a tier.
 
-Turning that constraint into a principle is the right thing to do with a constraint you cannot
-remove. It remains a constraint. The orchestrator is the one component whose cost and capability
-you cannot specify.
+Turning that into a principle is the right thing to do with a constraint you cannot remove. It
+remains a constraint. The orchestrator is the one component whose cost and capability you cannot
+specify.
 
 The larger version is the provider, not the model. An orchestrator skill runs inside one harness
 and is married to it. Every step is served by whichever vendor's agent the developer happened to
 open, and if a step would be better served by a different one there is no way to say so, because
 the thing that would have to say it is a guest in the session it would need to replace.
 
-Once the procedure lives outside the session, the coding agent becomes a parameter. Archon resolves
-a provider per node and can run planning on Claude and implementation on Codex in the same
-workflow, handing context between them explicitly because sessions do not cross providers.
-Conductor does the same across Copilot and Claude.
+Once the procedure lives outside the session, the coding agent becomes a parameter. An engine
+resolves a provider per node, so planning can run on one vendor's agent and implementation on
+another's, with context handed between them explicitly because sessions do not cross providers.
 
 Whether mixing vendors mid-run is a good idea is a separate question, and mostly it will not be.
 What matters is that it stops being an architectural impossibility and becomes a line of
 configuration.
 
 ### Its own context window
+
+![The Spider-Man pointing meme. Two identical Spider-Men point at each other, one labelled "the thing that would prune the conversation" and the other labelled "the conversation".]({{ '/public/harness-meme-prune-itself.png' | relative_url }}){: .meme}
 
 A run is one conversation. Everything every phase reads or writes accumulates in it, and the
 orchestrator has no programmatic control over the wrapper it runs in. When context needs pruning
@@ -94,28 +108,30 @@ session, parallel nodes start clean, and a node can opt out with `context: fresh
 resumes an earlier session it forks it rather than mutating it, so a retry cannot corrupt the
 transcript it retried from.
 
-None of that is expressible from inside the conversation, because the thing that would have to do
-the expressing is the conversation.
+None of that can be arranged from inside the conversation. Whatever did the arranging would be
+part of what it was arranging.
 
-### Two things at once
+### Two phases at once
 
-The orchestrator issues one prompt at a time. One conversation, one turn in flight, so phases with
-no dependency on each other still run in sequence.
+Parallelism inside a phase works. Dispatch several sub-agents in a single turn and they run
+concurrently, which is exactly how the review workflow fans its reviewer lanes out.
 
-The previous series hides this well, because most of the skeleton genuinely is a straight line: you
-cannot implement before you plan. The review workflow is the exception that shows the cost. Its
-distinctive move is to fan out several reviewer lanes in parallel, and inside an orchestrator skill
-that fan-out is sequential underneath. The design describes a parallel shape and executes a serial
-one.
+What cannot overlap is two phases. The orchestrator is one conversation with one turn in flight, so
+it dispatches a fan-out, waits for all of it to come back, and only then does anything else.
+Independent phases still run in sequence, and a slow one blocks everything behind it whether or not
+anything depends on it.
+
+Most of the skeleton genuinely is a straight line, so this costs less than it sounds: you cannot
+implement before you plan.
 
 An engine computes topological layers from the dependency edges and fires every independent node in
-a layer at once. That is not a feature somebody bolted on. It falls out of the control flow being a
-graph rather than a sequence of prompts.
+a layer at once. That falls out of the control flow being a graph instead of a sequence of
+prompts.
 
 ### Steps that need no intelligence
 
-The guarantee table in [part one](/designing-agentic-development-workflows-part-1/) promises
-*scripts over inference*: anything decidable deterministically is decided by a script. That
+The guarantee table in [part one of the previous series](/designing-agentic-development-workflows-part-1/)
+promises *scripts over inference*: anything decidable deterministically is decided by a script. That
 guarantee is real, and smaller than it sounds.
 
 The script is deterministic. Reaching it is not. In an orchestrator skill there is no such thing as
@@ -133,24 +149,27 @@ seam. Those exist to catch a class of failure that only exists because the model
 participant in its own control flow.
 
 An engine removes the model from the steps that never needed it. A `bash` or `script` node runs
-because the graph says so: no prompt constructed, no tokens spent, no inference, and no way to skip
-the step because nothing in the path is capable of deciding to skip it. Microsoft's phrasing is
-exact, that the orchestration layer consumes zero tokens and the structure is fixed at definition
-time.
+because the graph says so: no prompt constructed, no tokens spent, no inference, and no way to
+skip the step because nothing in the path is capable of deciding to skip it. The orchestration
+layer consumes no tokens at all, and the structure is fixed at definition time.
 
 That changes what **deterministic** can mean. In an orchestrator skill it means *the commands are
 deterministic*. In an engine it means *the commands are deterministic and so is the decision to run
 them*.
 
-One native mechanism escapes this and is worth naming: hooks fire on runtime events without the
-model choosing to fire them. But hooks intercept a run, they do not sequence one. They can stop
-something happening. They cannot make the next thing happen.
+![Two lanes. In the orchestrator lane, the model reads the procedure, then a dashed box marks a judgment about whether this is the moment, then the test suite runs; a dotted branch leaves the lane labelled "or not". In the engine lane, the graph leads straight to the same test suite box with nothing in between.]({{ '/public/harness-reaching-the-script.png' | relative_url }})
+
+*Figure 1: The command is identical in both. What differs is whether anything had to decide to reach it.*
+
+One native mechanism escapes this: hooks fire on runtime events without the model choosing to
+fire them. But hooks intercept a run, they do not sequence one. They can stop something happening.
+They cannot make the next thing happen.
 
 ### The order itself
 
-This is the deep one, and part six states it plainly without drawing the full conclusion: an
-instruction to a language model is a strong default, never a guarantee, and anything load-bearing
-needs a script behind it.
+This is the deep one, and [part six of the previous series](/designing-agentic-development-workflows-part-6/)
+states it plainly without drawing the full conclusion: an instruction to a language model is a strong
+default, never a guarantee, and anything load-bearing needs a script behind it.
 
 The design responds by putting scripts behind the load-bearing parts. The gate check is a script.
 The loop referee is a script. The seam guards are scripts. Each converts one instruction into an
@@ -162,6 +181,10 @@ You can guard every seam and still have no guarantee the phases ran in the order
 describes, because nothing outside the model is tracking which phase comes next.
 
 The scripts are patches over individual holes in a surface made of prose.
+
+![A wide slab representing the phase order written as prose, punched through by four holes. Three holes are covered by small amber plates labelled gate check, loop referee and seam guard. The fourth and largest hole, labelled "which phase comes next", is left open.]({{ '/public/harness-order-is-prose.png' | relative_url }})
+
+*Figure 2: Each script closes one hole. The surface they are fixed to is still prose.*
 
 An engine inverts this. The graph is data, parsed and schema-validated and checked for cycles
 before anything runs. The runtime decides which node executes next, and the model is invoked *by* a
@@ -185,7 +208,11 @@ flight, a second process deciding whether the working directory is free. The dif
 convenience, it is whether the procedure exists anywhere other than inside the process executing
 it.
 
-The previous series does implement this, and that is worth noticing rather than defending:
+![Two panels. On the left, a session: a dashed process box holding the run, with Slack, a dashboard, another run and tomorrow each connected by a line that stops short and ends in a cross. On the right, a run: an amber database row that all four reach with arrows.]({{ '/public/harness-session-vs-run.png' | relative_url }})
+
+*Figure 3: The difference is not convenience. It is whether the procedure exists anywhere other than inside the process executing it.*
+
+The previous series does implement this:
 
 - a run directory per run;
 - a small JSON state file written atomically, temp file then rename, so a crash cannot leave a
@@ -197,24 +224,16 @@ The previous series does implement this, and that is worth noticing rather than 
 That is a state machine. It is also hand-rolled, maintained by the same people trying to write the
 workflows, and every gap in it gets discovered in production.
 
-Part six's concurrency limitation is exactly such a gap. Nothing arbitrates two runs against one
-checkout, because arbitrating that needs a lock with an owner and an expiry, which needs a store,
-which needs something to stay authoritative when the process holding it dies.
+[Part six's](/designing-agentic-development-workflows-part-6/) concurrency limitation is exactly
+such a gap. Nothing arbitrates two runs against one checkout, because arbitrating that needs a
+lock with an owner and an expiry, which needs a store, which needs something to stay
+authoritative when the process holding it dies.
 
-Now look at what a real one contains. Archon's runs live in a database rather than a file,
-precisely so more than one process can observe and act on the same run. From that, four things
-follow that a file cannot give you:
-
-- **The pending row doubles as a lock** on the working directory, with a five-minute stale window
-  to clear rows orphaned by a crashed dispatch.
-- **Paused runs resume from another process entirely**, which is what makes a gate answerable from
-  Slack.
-- **Failed runs replay completed nodes from an event log** rather than trusting a cursor.
-- **Ambiguity gets surfaced, not guessed.** When the system cannot tell "running elsewhere" from
-  "orphaned by a crash", a deliberate rule says it refuses to decide and tells a person.
-
-None of that is unusual. All of it is the ordinary content of a workflow engine, and none of it is
-reachable from a Markdown file.
+Now look at what a real one contains. An engine's runs live in a database rather than a file,
+precisely so more than one process can observe and act on the same run. A row that outlives the
+process holding it can double as a lock on the working directory, be resumed by whoever picks it
+up, and record what actually happened instead of what a cursor believed. [Part two](/should-you-harness-the-harness-part-2/) takes each
+of those apart.
 
 **The choice is not between having a lifecycle and not having one.** It is between adopting one and
 writing one, and writing one well means writing a workflow engine badly, incrementally, in the
@@ -233,27 +252,21 @@ are the ones I had to argue myself out of.
 | **Observability** | artifacts are readable after the fact. What is missing is a live event stream: a gap in convenience, not capability |
 | **Per-step cost** | no breakdown by phase, only the provider console. Worth having, not worth changing architecture for |
 
-**Triggering is the one I had wrong, and it is worth showing the working.** The obvious claim is
-that an orchestrator skill has nobody to start it: a ticket moving to "ready" cannot begin a run, a
-person typing is the only trigger. That claim is false. Non-interactive mode expands a skill
-invocation in the prompt string, there is a documented flag for suppressing permission prompts when
-nobody is there to answer them, and running the whole thing from a GitHub Action has its own page
-in the manual. The gates are cheaper to remove than any of that: write the workflow without them,
-or simply tell the agent not to stop. So a scheduled job can drive the procedure end to end.
+Triggering needs one clarification, because the missing piece is easy to misplace. It is not the
+trigger, it is the *run*. A skill started by a cron entry is still a session, and nothing else can
+find it, watch it, pause it at a gate or resume it tomorrow. That is the last row of the table
+above.
 
-What is missing is not the trigger. It is that the thing started this way is a *session*, not a
-*run*. Nothing else can find it, watch it while it works, pause it at a gate and resume it from
-somewhere else tomorrow. That is the last row of the table above, and it is where this belongs.
+Isolation is the closest call. A second run entering the same worktree is exactly the kind of
+failure a skill cannot see coming, but the guard is a script and a skill can call a script. What it
+cannot do is *own* the lock, which is the previous problem again.
 
-Isolation is the other one I kept wanting to promote. It feels structural, because a second run
-entering the same worktree is exactly the kind of failure a skill cannot see coming. But the guard
-is a script, and a skill can call a script. What a skill cannot do is *own* the lock, which is the
-same problem again rather than an isolation problem.
-
-The per-step cost row comes with a caveat worth carrying forward: Archon counts node cost and not
-the overhead of the coding agent that invoked it, and that gap can reach forty percent.
+The cost row has a caveat of its own, and [part three](/should-you-harness-the-harness-part-3/)
+has it: what an engine reports per step is not the same as what the run costs you.
 
 ## What follows
+
+![The Office meme. Pam holds up two sheets of paper, one reading "A procedure the model agreed to follow" and the other "A procedure that runs." Caption: "Corporate needs you to find the differences between this picture and this picture." Pam says: "They're the same picture."]({{ '/public/harness-meme-same-picture.png' | relative_url }}){: .meme}
 
 Two of these are the same fact seen from either end. Every step runs through the model because the
 model holds the control flow, and the control flow is advisory because the thing holding it is a
@@ -261,10 +274,8 @@ model. Provider selection, context and parallelism trace back to the same root: 
 a participant in the conversation rather than the thing running it.
 
 The last one is different in kind, and it is the one that decides things. The others say what an
-orchestrator skill cannot do. That one says what it will make you do instead.
-
-Which is the honest summary. An orchestrator skill is a procedure a model has agreed to follow.
-That is worth a great deal, and it is not the same as a procedure that runs.
+orchestrator skill cannot do. That one says what it will make you do instead: maintain a workflow
+engine you never set out to write.
 
 All of which is a case for looking at a workflow engine, not for adopting one. Before that question
 can be answered, the category needs a definition, because "engine" has been doing a lot of

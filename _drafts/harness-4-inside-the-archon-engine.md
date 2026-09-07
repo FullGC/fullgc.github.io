@@ -1,10 +1,19 @@
 ---
 title:      "Should you harness the harness: inside the Archon engine"
 part_title: "Inside the Archon engine"
-subtitle:   "How a run is discovered, routed and executed, and the handful of decisions that took judgment."
+subtitle:   "How a run is discovered, routed and executed, and the handful of decisions that were easy to get wrong."
+description: >-
+  One workflow engine read from the inside: the four phases a run moves through, and the
+  bookkeeping decisions that separate working from mostly working.
+permalink:  /should-you-harness-the-harness-part-4/
+date:       2026-09-07 12:00:00
 series:     "Should You Harness the Harness"
 part:       4
-tags:       [ai, agents, workflows, automation, claude-code]
+tags:       [ai, agents, workflows, automation, claude-code, harness, archon]
+image:      /public/archon-state-machine.png
+banner:     false
+image_w:    1605
+image_h:    622
 ---
 
 The surprise, reading a workflow engine from the inside, is how little of it is about graphs.
@@ -12,13 +21,14 @@ Topological sorting is a first-year algorithm and it takes maybe fifty lines. Al
 else is bookkeeping: who holds the lock, what counts as a fatal error, what happens when a process
 dies without saying so.
 
-That turns out to be the honest description of the category. **The DAG is the part you would write
+That is the honest description of the category. **The DAG is the part you would write
 in an afternoon. The rest is the part you would get wrong for a year.**
 
-None of this is required reading. Part three said what Archon is and what it gives you, and that
-argument stands without any of what follows. This is here because the parts that took judgment are
-not the parts you would guess, and because most of them are worth stealing whether or not you ever
-run an engine.
+None of this is required reading. [Part three](/should-you-harness-the-harness-part-3/) said what
+Archon is and what it gives you, and that argument stands without any of what follows. Read on if
+you are building something like it: the lock expiry, the order the error classifier checks its
+patterns in, and forking a session instead of appending to it are the same three problems in any
+system where work outlives the process that started it.
 
 *Continues from part three, and assumes its vocabulary: command, workflow, worktree, node.*
 
@@ -29,7 +39,7 @@ door you came through only decides who gets told about it.
 
 ![A flowchart of the four phases. Discovery scans three sources, parses YAML, validates nodes and validates the DAG shape. Routing checks for an explicit workflow name and otherwise asks a model, then fuzzy-matches. Setup loads config, resolves provider and model, checks for a prior failed run, creates the run row and takes the path lock. DAG execution computes topological layers and runs each layer, evaluating conditions, substituting variables, executing nodes, and retrying or failing on the outcome.]({{ '/public/archon-pipeline.png' | relative_url }})
 
-*Figure 1: The whole engine on one page. Note how much of it is checks rather than work.*
+*Figure 1: The whole engine on one page. More of it is checks than work.*
 
 | Phase | What happens |
 |---|---|
@@ -48,8 +58,8 @@ exist:
 - **The graph validates.** No duplicate node IDs, no `depends_on` pointing at a node that is not
   there, no cycles, and no `$nodeId.output` reference to a node that does not exist.
 
-The detail I liked here is the failure mode. A broken YAML file records a `WorkflowLoadError` and
-shows up in `/workflow list`. It does not abort the discovery pass or block any other workflow from
+The failure mode is the good part. A broken YAML file records a `WorkflowLoadError` and shows up
+in `/workflow list`. It does not abort the discovery pass or block any other workflow from
 loading. One malformed file breaks one workflow.
 
 ### Routing: a model that cannot use tools
@@ -67,16 +77,23 @@ The name it emits then goes through a four-tier fuzzy match: exact, case-insensi
 (`plan` matches `feature-plan`), then substring. If everything fails, the system falls back to a
 general assistant workflow rather than guessing.
 
-### Setup and execution
+### Setup: unglamorous and load-bearing
 
-Setup is unglamorous and load-bearing: read config and merge per-project environment variables,
-resolve provider and model, check whether a previous failed run on this working directory can be
-resumed, create the run row, take the path lock, make the per-run artifacts directory and expose it
-to prompts as `$ARTIFACTS_DIR`.
+Before a single node runs, setup does seven things:
+
+- reads config and merges per-project environment variables;
+- resolves provider and model;
+- checks whether a previous failed run on this working directory can be resumed;
+- creates the run row;
+- takes the path lock;
+- makes the per-run artifacts directory;
+- exposes that directory to prompts as `$ARTIFACTS_DIR`.
 
 The worktree is created here too, on an auto-generated branch you can override with `--branch`, and
 these are git-native worktrees rather than clones. A workflow that does not touch the checkout
 declares `mutates_checkout: false` and opts out of both the worktree and the lock guarding it.
+
+### Isolation you have to clean up
 
 The part that is easy to skip when building this yourself is the other end:
 
@@ -91,21 +108,24 @@ Two constraints come with it. One branch maps to exactly one worktree, so the sa
 run twice at once. And a paused sub-run's worktree is reused when it resumes, so cleaning up too
 eagerly turns a paused run into a lost one.
 
-From there the executor builds topological layers from the `depends_on` edges and runs every node
-in a layer at once. Per node it evaluates
-the `when:` condition and the `trigger_rule` join policy, runs two passes of variable substitution,
-executes, and on success stores the output in an in-memory map and persists a `node_completed`
-event.
+### Execution: layers, then nodes
+
+The executor builds topological layers from the `depends_on` edges and runs every node in a layer
+at once. Per node it:
+
+- evaluates the `when:` condition and the `trigger_rule` join policy;
+- runs two passes of variable substitution;
+- executes;
+- on success, stores the output in an in-memory map and persists a `node_completed` event.
 
 On a transient error it retries up to `max_attempts`, twice by default, with a three second
-backoff. On a fatal error it stops immediately. Which raises the question of what counts as fatal,
-and that is a section of its own.
+backoff. On a fatal error it stops immediately. What counts as fatal is a section of its own.
 
 ### The node types
 
-![A fan-out from a DAG node to six node types, colour-coded. Blue for the AI nodes: prompt/command and loop. Orange for the shell nodes: bash and script. Purple for the gates: approval and cancel.]({{ '/public/archon-node-types.png' | relative_url }})
+![A fan-out from a DAG node to six node types, color-coded. Blue for the AI nodes: prompt/command and loop. Orange for the shell nodes: bash and script. Purple for the gates: approval and cancel.]({{ '/public/archon-node-types.png' | relative_url }})
 
-*Figure 2: The colours are the argument. Only the blue ones put a model in the path.*
+*Figure 2: The colors are the argument. Only the blue ones put a model in the path.*
 
 | Type | Category | How it runs |
 |---|---|---|
@@ -128,8 +148,8 @@ than failing the run.
 
 ### The model resolution chain
 
-The claim part two leaned on hardest was that the invoking session has no say in what serves a
-node. Here is the chain in full:
+The claim [part two](/should-you-harness-the-harness-part-2/) leaned on hardest was that the
+invoking session has no say in what serves a node. Here is the chain in full:
 
 | Priority | Source |
 |---|---|
@@ -156,7 +176,7 @@ is for:
 ```yaml
 - id: plan
   provider: claude
-  prompt: "Analyse the repo and plan: $ARGUMENTS"
+  prompt: "Analyze the repo and plan: $ARGUMENTS"
 
 - id: implement
   depends_on: [plan]
@@ -205,7 +225,7 @@ says so explicitly.
 Which is the same trade the previous series arrived at from the other direction. Artifacts survive;
 conversations do not. An engine does not fix that, it just makes the surviving part durable.
 
-## Where the judgment shows
+## Where the hard calls are
 
 Everything above is what you would expect a workflow engine to contain. What follows is what
 separates one that works from one that mostly works, and none of it would show up in a feature
@@ -213,12 +233,12 @@ comparison.
 
 ### The lock, and the five-minute window
 
-Part one argued that arbitrating two runs against one checkout needs a lock with an owner and an
-expiry. Here is that lock.
+[Part one](/should-you-harness-the-harness-part-1/) argued that arbitrating two runs against one
+checkout needs a lock with an owner and an expiry. Here is that lock.
 
-The `pending` row **is** the lock token. Before a run starts, the engine checks whether another run
-is already `running` or `paused` on the same worktree, and if so the new run is
-cancelled immediately with an actionable message rather than queued or silently run anyway.
+The `pending` row **is** the lock token. Before a run starts, the engine checks whether another
+run is already `running` or `paused` on the same worktree, and if so the new run is cancelled
+immediately with an actionable message rather than queued or silently run anyway.
 
 The expiry is a five-minute stale-pending window, which exists for exactly one situation: a
 dispatch that crashed between inserting the row and starting work. Without it, one crash poisons
@@ -242,10 +262,6 @@ oversight is the difference between an engine you trust and one you babysit.
 
 ### Three classes of error
 
-![Three diagrams. Error classification routes a caught error to transient (retry on rate limit or timeout), fatal (abort on auth, credits or permission) or unknown (three strikes then abort). Observability lists four channels: event rows in the database, a JSONL file log, an in-process emitter feeding SSE, and anonymous telemetry. Variable substitution runs in two passes: run-scoped variables first, then cross-node output references.]({{ '/public/archon-error-classification.png' | relative_url }})
-
-*Figure 4: Error classification, the observability channels, and the two substitution passes.*
-
 `classifyError()` sorts every caught error into three buckets:
 
 | Class | Patterns | Action |
@@ -254,14 +270,28 @@ oversight is the difference between an engine you trust and one you babysit.
 | **Transient** | rate limit, timeout, process exit, 429, overloaded | retry with exponential backoff |
 | **Unknown** | everything else | retry, but count consecutive occurrences and abort after three |
 
-The ordering is the interesting bit. Fatal patterns are checked *before* transient ones, so a
-message containing both, like `unauthorized: process exited with code 1`, classifies as fatal. Get
-that precedence backwards and an expired credential turns into a retry loop burning money on a
-request that cannot succeed.
+The ordering matters. Fatal patterns are checked *before* transient ones, so a message containing
+both, like `unauthorized: process exited with code 1`, classifies as fatal. Get that precedence
+backwards and an expired credential turns into a retry loop burning money on a request that
+cannot succeed.
 
-Note also what the unknown bucket does: it retries, because most unknown errors are transient, but
-it keeps a consecutive counter so an unrecognised permanent failure cannot spin forever. That is a
-considered answer to "we do not know", rather than picking one of the other two buckets and hoping.
+The unknown bucket retries, because most unknown errors are transient, but it keeps a consecutive
+counter so an unrecognized permanent failure cannot spin forever. That is a considered answer to
+"we do not know", rather than picking one of the other two buckets and hoping.
+
+### Four channels, and the three that can answer you
+
+A run writes itself down in four places. Event rows go to the database, which is what resume
+replays. A JSONL file log records the same run linearly. An in-process emitter feeds the web
+console over SSE. Anonymous telemetry goes to Archon.
+
+Only the first three can tell you why a run is stuck, and they are not redundant: the database has
+what finished, the log has what was said, the stream has what is happening now. Part three's
+complaint about having to guess which channel holds the answer is this list seen from the outside.
+
+![Three diagrams. Error classification routes a caught error to transient (retry on rate limit or timeout), fatal (abort on auth, credits or permission) or unknown (three strikes then abort). Observability lists four channels: event rows in the database, a JSONL file log, an in-process emitter feeding SSE, and anonymous telemetry. Variable substitution runs in two passes: run-scoped variables first, then cross-node output references.]({{ '/public/archon-error-classification.png' | relative_url }})
+
+*Figure 4: Error classification, the observability channels, and the two substitution passes.*
 
 ### Forking instead of mutating
 
@@ -288,8 +318,8 @@ inversion part two described, enforced at the level of the dependency graph.
 
 ## What the engineering gets right
 
-Read as a list, the decisions above have something in common: none of them is visible in a demo,
-and every one of them is the difference between an engine you trust and one you babysit.
+None of the decisions above is visible in a demo, and every one of them was somebody choosing the
+harder correct thing over the obvious one.
 
 - The lock has an **expiry**, because a dispatch that crashes between writing the row and starting
   work would otherwise poison that working directory permanently.
@@ -301,21 +331,9 @@ and every one of them is the difference between an engine you trust and one you 
   about who executes them.
 - When liveness cannot be determined, the system **refuses to decide** and says so.
 
-That last one has nothing to do with AI and is the most transferable idea here. A distributed
-system that guesses about liveness eventually kills a healthy run, and nobody finds out why.
-Encoding *I cannot tell, so I will ask* as a rule rather than an oversight is a choice somebody had
-to make on purpose.
-
 ## What follows
 
-Three observability channels exist: event rows in the database as the audit log and the source of
-truth for resume, a JSONL file log that survives a database reset, and an in-process emitter the
-HTTP server forwards over SSE to the web console. Telemetry is anonymous and opts out with an
-environment variable.
-
-That is a genuinely good picture of a *run*. Whether it is a good picture of *your work* is a
-different question, and it is the one the series is named for.
-
-The last part answers it, and deliberately does not answer it about Archon. What an engine gives
-you that no skill will, what it costs to live with, and how to decide for a team that is not this
-one.
+All of that is a good picture of a *run*. Whether it is a good picture of *your work* is the
+question the series is named for, and [part five](/should-you-harness-the-harness-part-5/) answers
+it without mentioning Archon again: what an engine gives you that no skill will, and the one risk
+no engineering fixes.
