@@ -6,7 +6,7 @@ description: >-
   What using a workflow engine is like: the front doors, the reusable pieces, the five
   claims Archon makes for itself, and the rough edges that come with it.
 permalink:  /should-you-harness-the-harness-part-3/
-date:       2026-09-07 11:00:00
+date:       2026-09-08 11:00:00
 series:     "Should You Harness the Harness"
 part:       3
 tags:       [ai, agents, workflows, automation, claude-code, harness, archon]

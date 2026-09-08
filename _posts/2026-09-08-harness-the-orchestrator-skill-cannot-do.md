@@ -6,7 +6,7 @@ description: >-
   Six limits an orchestrator skill cannot write its way out of, because they follow from
   where the procedure runs rather than from how well it was written.
 permalink:  /should-you-harness-the-harness-part-1/
-date:       2026-09-07 09:00:00
+date:       2026-09-08 09:00:00
 series:     "Should You Harness the Harness"
 part:       1
 tags:       [ai, agents, workflows, automation, claude-code, harness]

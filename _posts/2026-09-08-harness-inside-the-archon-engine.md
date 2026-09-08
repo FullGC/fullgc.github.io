@@ -6,7 +6,7 @@ description: >-
   One workflow engine read from the inside: the four phases a run moves through, and the
   bookkeeping decisions that separate working from mostly working.
 permalink:  /should-you-harness-the-harness-part-4/
-date:       2026-09-07 12:00:00
+date:       2026-09-08 12:00:00
 series:     "Should You Harness the Harness"
 part:       4
 tags:       [ai, agents, workflows, automation, claude-code, harness, archon]

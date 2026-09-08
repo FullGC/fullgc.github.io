@@ -95,7 +95,8 @@ procedure *inside* the agent session rather than around it:
   to implement: incrementally, in the margins of doing something else.
 
 No amount of better skill-writing reaches any of that. Whether it is worth reaching for something
-that does is a separate question, and a longer one.
+that does is a separate question, and a longer one:
+[Should you harness the harness](/should-you-harness-the-harness-part-1/) works through it.
 
 ---
 

@@ -8,7 +8,7 @@ description: >-
   What separates a workflow engine from an orchestrator skill, what that one inversion
   buys, and how little of what is sold as an engine actually qualifies.
 permalink:  /should-you-harness-the-harness-part-2/
-date:       2026-09-07 10:00:00
+date:       2026-09-08 10:00:00
 tags:       [ai, agents, workflows, automation, claude-code, harness]
 image:      /public/harness-the-inversion.png
 banner:     false

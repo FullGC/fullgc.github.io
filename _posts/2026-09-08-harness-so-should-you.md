@@ -8,7 +8,7 @@ description: >-
   Whether to move a development procedure out of the agent session: what actually justifies
   it, what it costs to live with, and the one risk no engineering fixes.
 permalink:  /should-you-harness-the-harness-part-5/
-date:       2026-09-07 13:00:00
+date:       2026-09-08 13:00:00
 tags:       [ai, agents, workflows, automation, claude-code, harness]
 image:      /public/harness-meme-two-chairs.png
 banner:     false
