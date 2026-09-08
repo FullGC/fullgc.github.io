@@ -159,6 +159,6 @@ The short list, in the order worth learning it:
     says how, which is what lets one workflow serve services in different languages, and what stops a
     hardcoded test command from failing silently in the next repo.
 
-None of this is prompt engineering. These are small distributed systems whose components happen
-to be language models, and the parts that make them trustworthy are the boring parts: files, hashes, exit
-codes, and a refusal to let any single step be the judge of its own success.
+These are small distributed systems whose components are language models. What makes them
+trustworthy is files, hashes, exit codes, and a refusal to let any single step be the judge of its
+own success.

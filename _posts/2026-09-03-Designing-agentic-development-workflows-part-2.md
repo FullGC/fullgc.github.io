@@ -20,8 +20,8 @@ A workflow's phases and its cast are the easy half. The hard half is keeping tha
 every step is carried out by something that would rather be agreeable than correct.
 
 What follows are the principles that hold that order in place, in two groups. The machinery comes
-first, then the doctrine that governs what a step does with its own judgment. Almost every one of them
-exists because something went wrong in a way that produced no error.
+first, then the doctrine that governs what a step does with its own judgment. Many of them exist
+because something went wrong in a way that produced no error.
 
 *This part assumes part one's vocabulary: orchestrator, skill, agent definition, channel adapter,
 deterministic primitive, and the run directory.
