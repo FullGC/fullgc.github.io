@@ -24,9 +24,7 @@ Packaging makes a collection installable and lets one workflow depend on another
 at the price of a dependency graph nobody can hold in their head. Porting to another harness is
 cheap for everything that is a file and expensive for everything that is control flow. And
 autonomy, meaning a ticket assigned to the agent and a reviewed pull request some time later,
-turns out to be less about capability than about making the exceptional case detectable. It
-ends where a description like this should end: with where the design hurts, and the short list
-of what to build first.
+turns out to be less about capability than about making the exceptional case detectable.
 
 *Leans on [part one](/designing-agentic-development-workflows-part-1/) and
 [part two](/designing-agentic-development-workflows-part-2/) throughout.*
@@ -385,10 +383,11 @@ a run that had a human watching:
 model capability. It is enforcement, isolation, classification and reporting: the boring parts, again.
 The exception is the last item, and it is a real one. Everything above it can be built inside the
 skills; a runner cannot, because a procedure that lives inside an interactive session has nothing to
-start it. Part six returns to that.
+start it. [Part six](/designing-agentic-development-workflows-part-6/) returns to that.
 
 ---
 
 That is the workflow packaged, ported and, eventually, left to run on its own. What is left is the
-part a description like this owes the reader: where the design still hurts, and the short list of
-what to build first.
+part a description like this owes the reader, and it is
+[part six](/designing-agentic-development-workflows-part-6/): where the design still hurts, and the
+short list of what to build first.

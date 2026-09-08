@@ -132,7 +132,7 @@ tends to determine its outcome.**
 | The developer at the keyboard | a procedure that cannot be talked to at all | a straitjacket where a sentence used to do |
 
 Neither is wrong. It is one property seen from two chairs, and no amount of tooling resolves it. An
-evaluation staffed by one group produces a confident answer the other will not honour, which is
+evaluation staffed by one group produces a confident answer the other will not honor, which is
 cheaper to find out before the pilot than after the rollout.
 
 In practice it counted for little. It was annoying and it was liveable. If the next section did not

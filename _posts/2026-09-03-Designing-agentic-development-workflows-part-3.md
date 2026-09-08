@@ -152,36 +152,33 @@ Tiering is about where the irrecoverable decisions live, not about average diffi
 
 ## What the design buys
 
-That is the design: the components, the shape of a run, the principles that keep that shape honest, how
-work is sized, where the human stands, what each step costs to run, and how failures are classified. Before moving on to how you
-know any of it works, it is worth stating what all that machinery is actually for.
+That is the design: the components, the shape of a run, the principles that keep that shape honest,
+how work is sized, where the human stands, what each step costs to run, and how failures are
+classified.
 
-The largest claim was made at the very start: what the person invoking it stops having to do. That is
-the adoption argument, and it outweighs everything below. What follows is what the engineering buys.
+The largest claim was made
+[at the very start](/designing-agentic-development-workflows-part-1/#what-all-of-this-is-for): what
+the person invoking it stops having to do. That is the adoption argument, and it outweighs
+everything below. What follows is what the engineering buys.
 
-**Interruptibility.** A run can be stopped at any phase and either resumed from its cursor or simply read.
-Nothing important lives only in a transcript.
-
-**Attributable failure.** Guards and exit codes mean a failure names the step that caused it, instead of
-an agent quietly proceeding on missing input and failing three phases downstream.
-
-**Auditability.** The approval log records what a human approved, by content hash and timestamp. The
-publish record says what actually reached the outside world. The report explains the run to someone who
-never watched it.
-
-**Composability.** Because phases talk through files, workflows chain, skills stand alone, and any phase
-can be replaced by a human doing it by hand.
-
-**Compounding improvement.** Shared skills mean a fix in one place improves every workflow that uses it, and makes it worth knowing which shared component hurts most.
-
-**Bounded cost.** Iteration ceilings, retry caps and escalation limits mean a run cannot grind
-indefinitely; the failure mode is a clear stop, not a runaway bill.
-
-**Reviewable output.** One commit per unit of work, messages that reference the originating item, and a
-diff confined to the files the plan named. The reviewer's first question, "why is this file in here?", is answered before they ask it.
-
-**The ability to decline.** That is the whole difference between a system that *addresses* feedback and one
-that merely *obeys* it.
+- **Interruptibility.** A run can be stopped at any phase and either resumed from its cursor or
+  simply read. Nothing important lives only in a transcript.
+- **Attributable failure.** Guards and exit codes mean a failure names the step that caused it,
+  instead of an agent quietly proceeding on missing input and failing three phases downstream.
+- **Auditability.** The approval log records what a human approved, by content hash and timestamp.
+  The publish record says what actually reached the outside world. The report explains the run to
+  someone who never watched it.
+- **Composability.** Because phases talk through files, workflows chain, skills stand alone, and any
+  phase can be replaced by a human doing it by hand.
+- **Compounding improvement.** Shared skills mean a fix in one place improves every workflow that
+  uses it, and makes it worth knowing which shared component hurts most.
+- **Bounded cost.** Iteration ceilings, retry caps and escalation limits mean a run cannot grind
+  indefinitely; the failure mode is a clear stop, not a runaway bill.
+- **Reviewable output.** One commit per unit of work, messages that reference the originating item,
+  and a diff confined to the files the plan named. The reviewer's first question, "why is this file
+  in here?", is answered before they ask it.
+- **The ability to decline.** That is the whole difference between a system that *addresses*
+  feedback and one that merely *obeys* it.
 
 Every one of those is a claim, and a claim you have not checked is a hope. The rest of this document is
 about checking them, shipping them, and being honest about where they fail.

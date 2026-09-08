@@ -250,14 +250,15 @@ named in the plan.
 Five kinds of component, and the distinctions earn their keep:
 
 **Orchestrator**: the workflow itself. Owns control flow, phase order, human gates, dispatch and
-wiring. Owns no domain logic. It is thin on purpose (part two).
+wiring. Owns no domain logic. It is thin on purpose ([part two](/designing-agentic-development-workflows-part-2/)).
 
 **Skill**: a unit of work: written instructions plus, usually, scripts. Planning, implementing,
 validating, exploring, presenting something for approval. A skill knows nothing about which workflow is
 calling it.
 
-**Agent**: a *dispatched* sub-agent with its own context window, model, effort level and tool
-allowlist, declared as a file and registered with the runtime. This is the only place model and effort can be chosen (part two).
+**Agent definition**: a file declaring a *dispatched* sub-agent's context window, model, effort
+level and tool allowlist, registered with the runtime. This is the only place model and effort can
+be chosen ([part two](/designing-agentic-development-workflows-part-2/)).
 
 **Channel adapter**: the only component that knows the outside world exists: one that reads from the
 code-hosting platform, one that writes to it, one that talks to the issue tracker. Everything else is
@@ -397,7 +398,7 @@ human has open, and so several runs can proceed at once. And **flatten at the ha
 iteration produces a history nobody wants to review, so collapse it into reviewable changes before
 handing over.
 
-### What all of this is for
+## What all of this is for
 
 Worth stating once before the principles arrive, because it is the only part the
 person invoking a workflow actually feels: what they stop having to do. They bring the unit of work

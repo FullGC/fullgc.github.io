@@ -365,7 +365,7 @@ what it cost, and that is the question a sponsor asks first.
 
 Most teams build exactly one of the three and then over-claim from it. They are not substitutes.
 
-### Four streams, and a division of labour that is easy to get wrong
+### Four streams, and a division of labor that is easy to get wrong
 
 Delivery measurement draws on four independent sources, and each owns something the others cannot
 supply:
@@ -415,7 +415,7 @@ review, merged, deployed, done; time in each status; reopens; review rounds; siz
 attempts; runs, outcome, iterations, gate rejections; and spend.
 
 Every metric that follows is then a subtraction or a count over that row, which is what keeps a
-metric catalogue from turning into a pile of bespoke queries.
+metric catalog from turning into a pile of bespoke queries.
 
 ### Four lenses, and one rule about reading them
 

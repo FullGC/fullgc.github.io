@@ -23,11 +23,11 @@ What follows are the principles that hold that order in place, in two groups. Th
 first, then the doctrine that governs what a step does with its own judgment. Almost every one of them
 exists because something went wrong in a way that produced no error.
 
-*This part assumes part one's vocabulary: orchestrator, skill, agent, channel adapter, deterministic
-primitive, and the run directory. [Part one](/designing-agentic-development-workflows-part-1/)
-introduces all six.*
+*This part assumes part one's vocabulary: orchestrator, skill, agent definition, channel adapter,
+deterministic primitive, and the run directory.
+[Part one](/designing-agentic-development-workflows-part-1/) introduces them.*
 
-## Machinery Principles
+## Machinery principles
 
 Where state lives, how one phase hands work to the next, what a gate has to be to count as one, and
 who is allowed to decide that a loop has finished.
@@ -204,7 +204,7 @@ Watch for two things here. A promise to "write a report on every exit path" only
 if the runtime treats certain filenames specially, a sub-agent may be unable to write the very file it
 exists to produce: check that the reporting step can actually write to the name you chose.
 
-## Doctrine Principles
+## Doctrine principles
 
 What a step should refuse to do, how it should treat text that arrives from outside, and how it
 should record a decision so the decision can be audited later.
